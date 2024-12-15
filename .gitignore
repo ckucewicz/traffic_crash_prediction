@@ -4,3 +4,6 @@
 # Junk Files
 .DS_Store
 .ipynb_checkpoints
+
+# API
+kaggle.json
