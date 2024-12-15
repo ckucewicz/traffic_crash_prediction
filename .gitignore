@@ -6,4 +6,5 @@
 .ipynb_checkpoints
 
 # API
+/config
 kaggle.json
