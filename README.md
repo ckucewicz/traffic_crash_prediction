@@ -261,7 +261,7 @@ Additionally, I’m interested in delving into the overrepresentation of males i
 
 View the full project in the Jupyter Notebook [here](https://github.com/ckucewicz/). 
 <br><br>
-View the project presentation [here](https://github.com/ckucewicz/traffic_crash_prediction/presentation.pdf)
+View the project presentation [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf)
 
 
 Contact Chris Kucewicz at [cfkucewicz@gmail.com](cfkucewicz@gmail.com) with additional questions.
