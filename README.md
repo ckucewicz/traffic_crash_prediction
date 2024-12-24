@@ -1,9 +1,9 @@
 # Chicago Car Crash Analysis
 Author: [Chris Kucewicz](https://www.linkedin.com/in/chriskucewicz/)
 <br><br>
-View the full project in the Jupyter Notebook [here](https://github.com/ckucewi$
+Full project in the Jupyter Notebook [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb)
 <br><br>
-View the project presentation [here](https://github.com/ckucewicz/traffic_crash$
+Project presentation [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf)
 
 
 ## Overview
