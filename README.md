@@ -107,14 +107,18 @@ Crashes occurring in darkness with lighted roads are overrepresented in serious 
 * **Airbag Deployment**: 
 
 Airbags are deployed in **35.4**% of serious injury crashes, compared to **9.5**% of total injuries, suggesting that airbag deployment may serve as a proxy for factors such as vehicle size or speed, indicating higher impact forces in serious crashes.
+<br>
+![Airbag Deployed Distribution Plot](https://github.com/ckucewicz/traffic_crash_prediction/raw/main/images/airbag_deployed_distribution_plot.png)
     
+
 #### 2. Proxies for Speed as a Contributing Factor:
 
 
 * **Road Speed Limits**: 
 
 Roads classified as having ‘slow’ speed limits (< 25 mph) show disproportionately fewer serious crashes, while roads with ‘medium’ speed limits (26-40 mph) are overrepresented in serious crashes.
-
+<br>
+![Speed Category Distribution Plot](https://github.com/ckucewicz/traffic_crash_prediction/raw/main/images/speed_category_distribution_plot.png)
 
 * **Aggressive/Reckless Driving**: 
 
