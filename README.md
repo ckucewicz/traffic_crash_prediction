@@ -1,5 +1,10 @@
 # Chicago Car Crash Analysis
 Author: [Chris Kucewicz](https://www.linkedin.com/in/chriskucewicz/)
+<br><br>
+View the full project in the Jupyter Notebook [here](https://github.com/ckucewi$
+<br><br>
+View the project presentation [here](https://github.com/ckucewicz/traffic_crash$
+
 
 ## Overview
 This project analyzes traffic crash data from Chicago's Open Data Portal to identify patterns and factors contributing to fatal and serious vehicle crashes. By leveraging datasets on crash incidents, involving people, and vehicles, the analysis provides actionable insights into high-risk conditions and behaviors. The results aim to inform public safety initiatives and reduce traffic incidents through data-driven decisions.
