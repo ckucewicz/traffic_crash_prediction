@@ -97,7 +97,7 @@ Since the dataset focuses solely on crash incidents and lacks data on all vehicl
 * **Sex**: 
 
 Males are overrepresented in serious injuries, accounting for **54.4**% of serious injuries, despite comprising **47.8**% of total injuries.
-![Male Overrepresentation in Serious Crashes](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/images/sex_distribution_plot.png)
+![Male Overrepresentation in Serious Crashes](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/images/sex_dist_plot.png)
 
 * **Lighting Condition**: 
 
