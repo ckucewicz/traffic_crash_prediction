@@ -2,7 +2,6 @@
 Author: [Chris Kucewicz](https://www.linkedin.com/in/chriskucewicz/)
 <br><br>
 Full project in the Jupyter Notebook [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb)
-<br><br>
 Project presentation [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf)
 
 
@@ -278,3 +277,15 @@ Contact Chris Kucewicz at [cfkucewicz@gmail.com](cfkucewicz@gmail.com) with addi
 
 ## Repository Structure
 
+traffic_crash_prediction/
+│
+├── images/                   # Directory containing all images used in the project
+│   ├── decision_tree_plot.png    # Example: Decision tree visualization
+│   ├── dt_feature_importances.jpg # Example: Feature importance plot
+│   └── ...                      # Additional project-related images
+│
+├── .gitignore                # File specifying untracked files to be ignored by Git
+├-    README.md                 # Project documentation
+├── data_cleaning_notebook.ipynb  # Notebook for data cleaning and preprocessing
+├── notebook.ipynb            # Main notebook for analysis and modeling
+├── presentation.pdf          # Final presentation of the project findings
