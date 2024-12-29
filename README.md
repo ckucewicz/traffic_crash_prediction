@@ -2,6 +2,7 @@
 Author: [Chris Kucewicz](https://www.linkedin.com/in/chriskucewicz/)
 <br><br>
 Full project in the Jupyter Notebook [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb)
+
 Project presentation [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf)
 
 
@@ -276,7 +277,7 @@ View the project presentation [here](https://github.com/ckucewicz/traffic_crash_
 Contact Chris Kucewicz at [cfkucewicz@gmail.com](cfkucewicz@gmail.com) with additional questions.
 
 ## Repository Structure
-
+```
 traffic_crash_prediction/
 │
 ├── images/                   # Directory containing all images used in the project
@@ -289,3 +290,4 @@ traffic_crash_prediction/
 ├── data_cleaning_notebook.ipynb  # Notebook for data cleaning and preprocessing
 ├── notebook.ipynb            # Main notebook for analysis and modeling
 ├── presentation.pdf          # Final presentation of the project findings
+```
