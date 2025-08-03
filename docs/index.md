@@ -48,11 +48,11 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 | **Season (Winter/Summer)** | Seasonal extremes associated with elevated risk        |
 
 
-<iframe src="docs/images/decision_tree_plot.png" width="100%" height="400" style="border:none;"></iframe>
+<img src="images/decision_tree_plot.png" alt="Decision Tree Plot" width="100%" height="400">
 
 *The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
 
-<iframe src="docs/images/dt_feature_importances.jpg" width="100%" height="400" style="border:none;"></iframe>
+<img src="images/dt_feature_importances.jpg" alt="Feature Importances" width="100%" height="400">
 
 ---
 
