@@ -1,4 +1,3 @@
-# Chicago Car Crash Prediction  
 *Machine Learning Case Study by Chris Kucewicz*
 
 > Real-world classification project predicting serious injuries in Chicago traffic crashes using interpretable models on imbalanced, messy public data.
@@ -83,7 +82,7 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 
 ---
 
-[Full Jupyter Notebook](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb) 
-[Presentation Slides](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf)
-[GitHub Repo](https://github.com/ckucewicz/traffic_crash_prediction)
+[Full Jupyter Notebook](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb) |
+[Presentation Slides](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf) |
+[GitHub Repo](https://github.com/ckucewicz/traffic_crash_prediction) |
 Contact: cfkucewicz@gmail.com
