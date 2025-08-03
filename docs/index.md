@@ -52,7 +52,19 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 
 *The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
 
-<img src="images/dt_feature_importances.jpg" alt="Feature Importances" width="100%" height="400">
+
+### Top Feature Importances from Decision Tree Model
+
+| Feature     | Category        | Importance |
+|-------------|------------------|------------|
+| Airbag      | Not Deployed     | 0.0625     |
+| Crash Type  | Unknown/Other    | 0.0499     |
+| Sex         | Male             | 0.0437     |
+| Season      | Summer           | 0.0414     |
+| Season      | Winter           | 0.0397     |
+| Season      | Spring           | 0.0391     |
+
+*The model prioritized contextual and driver-related features. Injury severity was more likely when airbags did not deploy, crashes occurred in less favorable seasons, or the driver was male. These results provide interpretable insights aligned with known crash risk factors.*
 
 ---
 
