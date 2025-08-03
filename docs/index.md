@@ -14,6 +14,11 @@ Can we predict whether a traffic crash results in serious injury — and underst
 
 Using 900K+ crash records from Chicago’s Open Data Portal, this project predicts *serious injury outcomes* (fatal or incapacitating) to support data-driven traffic safety policy. The goal was not just prediction, but **interpretation** — building a model that can inform real-world decision-making.
 
+Data sources:
+* [Traffic Crashes - Crashes](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if/about_data)
+* [Traffic Crashes - People](https://data.cityofchicago.org/Transportation/Traffic-Crashes-People/u6pd-qa9d/about_data)
+* [Traffic Crashes - Vehicles](https://data.cityofchicago.org/Transportation/Traffic-Crashes-Vehicles/68nd-jvt3/about_data)
+
 ---
 
 ## ML Problem Framing
@@ -24,7 +29,7 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 - **Goal:** Use interpretable, policy-relevant models  
 - **Data Sources:** Crash, Vehicle, and People datasets (merged)
 
-<img src="docs/images/target_distribution.jpg" alt="Decision Tree Plot" width="100%" height="400">
+<img src="images/target_distribution.jpg" alt="Decision Tree Plot" width="100%" height="600">
 
 ---
 
