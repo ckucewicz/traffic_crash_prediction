@@ -1,6 +1,6 @@
 title: Traffic Crash Prediction
-description: Predicting and analyzing severe crashes in Chicago using machine learning and open data
-theme: null
+description: Predicting and analyzing severe crashes in Chicago using machine learning
+theme: minima
 markdown: kramdown
 plugins:
   - jekyll-relative-links
