@@ -31,6 +31,8 @@ Data sources:
 
 <img src="images/target_distribution.jpg" alt="Decision Tree Plot" width="100%" height="600">
 
+*Serious injuries account for less than 5% of all crashes, highlighting a significant class imbalance in the dataset. To address this, the modeling pipeline used oversampling with SMOTE and class weighting to improve recall for serious injury predictions.*
+
 ---
 
 ## Modeling Pipeline
@@ -54,6 +56,8 @@ Data sources:
 | **Crash Cause**        | High gain, though often “Unknown/Other”                  |
 | **Season (Winter/Summer)** | Seasonal extremes associated with elevated risk        |
 
+
+## Decision Tree Plot of Final Model
 
 <img src="images/decision_tree_plot.png" alt="Decision Tree Plot" width="100%" height="400">
 
