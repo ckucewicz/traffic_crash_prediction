@@ -2,7 +2,7 @@
 
 > Real-world classification project predicting serious injuries in Chicago traffic crashes using interpretable models on imbalanced, messy public data.
 
-**Tech Stack:** Python, Pandas, scikit-learn, imbalanced-learn (SMOTE), GridSearchCV, Jupyter
+**Tech Stack:** Python, Pandas, scikit-learn, imbalanced-learn (SMOTE), GridSearchCV
 
 **[GitHub Repository](https://github.com/ckucewicz/traffic_crash_prediction)**
 
