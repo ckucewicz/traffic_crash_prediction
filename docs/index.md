@@ -53,7 +53,7 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 *The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
 
 
-### Top Feature Importances from Decision Tree Model
+## Top Feature Importances from Decision Tree Model
 
 | Feature     | Category        | Importance |
 |-------------|------------------|------------|
