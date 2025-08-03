@@ -8,6 +8,8 @@
 
 <img src="images/chicago_header_image.jpg" alt="Decision Tree Plot" width="100%" height="350">
 
+*Photo by [Sawyer Bengtson](https://unsplash.com/@sawyerbengtson) on Unsplash*
+
 ---
 
 ## Problem & Objective
