@@ -10,7 +10,7 @@ Project presentation [here](https://github.com/ckucewicz/traffic_crash_predictio
 This project analyzes traffic crash data from Chicago's Open Data Portal to identify patterns and factors contributing to fatal and serious vehicle crashes. By leveraging datasets on crash incidents, involving people, and vehicles, the analysis provides actionable insights into high-risk conditions and behaviors. The results aim to inform public safety initiatives and reduce traffic incidents through data-driven decisions.
 
 
-<img src="./images/chicago_header_image.jpg" width="1280" height="640">
+<img src="./docs/images/chicago_header_image.jpg" width="1280" height="640">
 
 *Photo by [Sawyer Bengtson](https://unsplash.com/@sawyerbengtson) on Unsplash*
 ___
@@ -208,7 +208,7 @@ The predictive performance of my models was generally low, with the best-perform
 However, the main focus of this project was on model inference rather than predictive accuracy. The goal was to understand how the model makes predictions in order to help identify key contributing factors in serious (fatal or incapacitating) traffic crashes. Decision trees are ideal for this type of analysis because they are simple, interpretable, and provide insights into feature importance.
 
 
-![Decision Tree Plot](images/decision_tree_plot.png)
+![Decision Tree Plot](docs/images/decision_tree_plot.png)
 
 
 Entropy is a measure of the uncertainty or impurity in a dataset. When a decision tree splits the data based on a feature, it seeks to reduce the entropy in the resulting subsets. The more a feature helps to reduce uncertainty, the more important it is in making decisions. Information gain is the reduction in entropy when a feature is used to split the data. A higher information gain indicates that the feature is more effective at clarifying the target variable’s behavior.
@@ -216,7 +216,7 @@ Entropy is a measure of the uncertainty or impurity in a dataset. When a decisio
 The feature_importances_ attribute in decision trees ranks features based on how much they reduce entropy across the tree. Features with higher importance scores are those that provide more significant reductions in uncertainty, helping the model make more confident predictions. Unlike linear regression coefficients, feature importance scores in decision trees do not convey the direction or magnitude of the effect on the target variable, but instead reflect their contribution to reducing uncertainty.
 
 
-![Decision Tree Feature Importances](images/dt_feature_importances.jpg)
+![Decision Tree Feature Importances](docs/images/dt_feature_importances.jpg)
 
 
 Based on the decision tree model, the most important features for predicting serious car crashes were:
