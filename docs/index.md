@@ -24,6 +24,8 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 - **Goal:** Use interpretable, policy-relevant models  
 - **Data Sources:** Crash, Vehicle, and People datasets (merged)
 
+<img src="docs/images/target_distribution.jpg" alt="Decision Tree Plot" width="100%" height="400">
+
 ---
 
 ## Modeling Pipeline
