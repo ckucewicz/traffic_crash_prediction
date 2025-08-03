@@ -8,3 +8,5 @@
 # API
 /config
 kaggle.json
+chicago-traffic-data.zip
+chicago_traffic_data/
