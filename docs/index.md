@@ -6,6 +6,8 @@
 
 **[GitHub Repository](https://github.com/ckucewicz/traffic_crash_prediction)**
 
+<img src="images/chicago_header_image.jpg" alt="Decision Tree Plot" width="100%" height="350">
+
 ---
 
 ## Problem & Objective
