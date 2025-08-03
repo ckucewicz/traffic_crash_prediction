@@ -104,7 +104,7 @@ Since the dataset focuses solely on crash incidents and lacks data on all vehicl
 Males are overrepresented in serious injuries, accounting for **54.4**% of serious injuries, despite comprising **47.8**% of total injuries.
 
 
-![Male Overrepresentation in Serious Crashes](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/images/sex_dist_plot.png)
+![Male Overrepresentation in Serious Crashes](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/docs/images/sex_dist_plot.png)
 
 
 * **Lighting Condition**: 
@@ -117,7 +117,7 @@ Crashes occurring in darkness with lighted roads are overrepresented in serious 
 Airbags are deployed in **35.4**% of serious injury crashes, compared to **9.5**% of total injuries, suggesting that airbag deployment may serve as a proxy for factors such as vehicle size or speed, indicating higher impact forces in serious crashes.
 
 
-![Airbag Deployed Distribution Plot](https://github.com/ckucewicz/traffic_crash_prediction/raw/main/images/airbag_deployed_distribution_plot.png)
+![Airbag Deployed Distribution Plot](https://github.com/ckucewicz/traffic_crash_prediction/raw/main/docs/images/airbag_deployed_distribution_plot.png)
     
 
 #### 2. Proxies for Speed as a Contributing Factor:
@@ -128,7 +128,7 @@ Airbags are deployed in **35.4**% of serious injury crashes, compared to **9.5**
 Roads classified as having ‘slow’ speed limits (< 25 mph) show disproportionately fewer serious crashes, while roads with ‘medium’ speed limits (26-40 mph) are overrepresented in serious crashes.
 
 
-![Speed Category Distribution Plot](https://github.com/ckucewicz/traffic_crash_prediction/raw/main/images/speed_category_distribution_plot.png)
+![Speed Category Distribution Plot](https://github.com/ckucewicz/traffic_crash_prediction/raw/main/docs/images/speed_category_distribution_plot.png)
 
 
 * **Aggressive/Reckless Driving**: 
