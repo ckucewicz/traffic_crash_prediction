@@ -5,7 +5,7 @@
 
 **Tech Stack:** Python, Pandas, scikit-learn, imbalanced-learn (SMOTE), GridSearchCV, Jupyter
 
-**[GitHub Repository](link_to_repo)**
+**[GitHub Repository](https://github.com/ckucewicz/traffic_crash_prediction)**
 
 ---
 
@@ -48,8 +48,20 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 | **Crash Cause**        | High gain, though often “Unknown/Other”                  |
 | **Season (Winter/Summer)** | Seasonal extremes associated with elevated risk        |
 
-![Decision Tree Plot](images/decision_tree_plot.png)  
+
+<iframe src="images/decision_tree_plot.png" width="100%" height="400" style="border:none;"></iframe>
+
 *The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
+
+<iframe src="images/dt_feature_importances.jpg" width="100%" height="400" style="border:none;"></iframe>
+
+---
+
+## Policy-Relevant Takeaways
+
+- **Male involvement** and **mid-speed roads** are linked to serious crashes  
+- **Airbag deployment** (as a proxy for high-impact collisions) was the strongest predictor  
+- Findings support **targeted safety campaigns**, **vehicle weight regulations**, and **airbag inspection policies**
 
 ---
 
@@ -68,14 +80,6 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 - Explore ensemble models with **SHAP** for interpretability  
 - Refine feature engineering (e.g., separate driver vs. passenger sex)  
 - Compare with statistical models (e.g., Poisson/Negative Binomial)  
-
----
-
-## Policy-Relevant Takeaways
-
-- **Male involvement** and **mid-speed roads** are linked to serious crashes  
-- **Airbag deployment** (as a proxy for high-impact collisions) was the strongest predictor  
-- Findings support **targeted safety campaigns**, **vehicle weight regulations**, and **airbag inspection policies**
 
 ---
 
