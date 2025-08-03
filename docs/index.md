@@ -49,11 +49,11 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 | **Season (Winter/Summer)** | Seasonal extremes associated with elevated risk        |
 
 
-<iframe src="images/decision_tree_plot.png" width="100%" height="400" style="border:none;"></iframe>
+<iframe src="docs/images/decision_tree_plot.png" width="100%" height="400" style="border:none;"></iframe>
 
 *The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
 
-<iframe src="images/dt_feature_importances.jpg" width="100%" height="400" style="border:none;"></iframe>
+<iframe src="docs/images/dt_feature_importances.jpg" width="100%" height="400" style="border:none;"></iframe>
 
 ---
 
@@ -83,7 +83,7 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 
 ---
 
-[Full Jupyter Notebook](link_to_notebook.ipynb)  
-[Presentation Slides](link_to_presentation.pdf)  
-[GitHub Repo](link_to_repo)  
+[Full Jupyter Notebook](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb) 
+[Presentation Slides](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf)
+[GitHub Repo](https://github.com/ckucewicz/traffic_crash_prediction)
 Contact: cfkucewicz@gmail.com
