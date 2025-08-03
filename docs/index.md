@@ -65,7 +65,7 @@ Using 900K+ crash records from Chicago’s Open Data Portal, this project predic
 | Season      | Spring           | 0.0391     |
 
 *The model prioritized contextual and driver-related features. Injury severity was more likely when airbags did not deploy, crashes occurred in less favorable seasons, or the driver was male. These results provide interpretable insights aligned with known crash risk factors.*
-
+<br>
 ---
 
 ## Policy-Relevant Takeaways
