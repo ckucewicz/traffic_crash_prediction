@@ -45,6 +45,8 @@ Data sources:
 | Hyperparameter Tuning   | GridSearchCV (on class weights) |
 | Final Model             | **Decision Tree** (PR AUC = 0.096) |
 
+
+Explore the full modeling process, from data prep to evaluation, in the notebook. View it [here]((https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb)).
 ---
 
 ## Feature Insights
