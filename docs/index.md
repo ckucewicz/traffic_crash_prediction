@@ -68,7 +68,7 @@ Explore the modeling process step-by-step in the notebook. View it [here](https:
 
 <img src="images/decision_tree_plot.png" alt="Decision Tree Plot" width="100%" height="400">
 
-*The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
+*The decision tree revealed interpretable splits based on the driver reversing direction and/or stopping, along with environmental and road conditions.*
 
 
 ## Top Feature Importances from Decision Tree Model
