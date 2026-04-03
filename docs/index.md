@@ -2,9 +2,13 @@
 
 > Real-world classification project predicting serious injuries in Chicago traffic crashes using interpretable models on imbalanced, messy public data.
 
-**Tech Stack:** Python, Pandas, scikit-learn, imbalanced-learn (SMOTE), GridSearchCV, Jupyter
+**Tech Stack:** Python, Pandas, scikit-learn, imbalanced-learn (SMOTE), GridSearchCV
 
 **[GitHub Repository](https://github.com/ckucewicz/traffic_crash_prediction)**
+
+<img src="images/chicago_header_image.jpg" alt="Decision Tree Plot" width="100%" height="350">
+
+*Photo by [Sawyer Bengtson](https://unsplash.com/@sawyerbengtson) on Unsplash*
 
 ---
 
@@ -31,6 +35,8 @@ Data sources:
 
 <img src="images/target_distribution.jpg" alt="Decision Tree Plot" width="100%" height="600">
 
+*Serious injuries account for less than 5% of all crashes, highlighting a significant class imbalance in the dataset. To address this, the modeling pipeline used oversampling with SMOTE and class weighting to improve recall for serious injury predictions.*
+
 ---
 
 ## Modeling Pipeline
@@ -42,6 +48,9 @@ Data sources:
 | Evaluation Metric       | Precision-Recall AUC (PR AUC) |
 | Hyperparameter Tuning   | GridSearchCV (on class weights) |
 | Final Model             | **Decision Tree** (PR AUC = 0.096) |
+
+
+Explore the modeling process step-by-step in the notebook. View it [here](https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb).
 
 ---
 
@@ -55,9 +64,11 @@ Data sources:
 | **Season (Winter/Summer)** | Seasonal extremes associated with elevated risk        |
 
 
+## Decision Tree Plot of Final Model
+
 <img src="images/decision_tree_plot.png" alt="Decision Tree Plot" width="100%" height="400">
 
-*The decision tree revealed interpretable splits based on driver sex, airbag deployment, and seasonality.*
+*The decision tree revealed interpretable splits based on the driver reversing direction and/or stopping, along with environmental and road conditions.*
 
 
 ## Top Feature Importances from Decision Tree Model
