@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chicago Traffic Crash Analysis — Chris Kucewicz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:    #003087;
+    --blue-mid:#0047BB;
+    --red:     #E4002B;
+    --white:   #FFFFFF;
+    --off-white:#F5F5F3;
+    --text:    #1a1a1a;
+    --muted:   #666;
+    --card-bg: rgba(255,255,255,0.97);
+    --shadow:  0 4px 32px rgba(0,0,0,0.13);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--text);
+    background: var(--blue);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ─────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 56px;
+    background: var(--blue);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── SCROLLY LAYOUT ──────────────────────────────── */
+  .scrolly-container {
+    position: relative;
+  }
+
+  /* sticky map pane */
+  .map-pane {
+    position: sticky;
+    top: 56px;
+    width: 100%;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    background: var(--blue);
+    z-index: 1;
+  }
+
+  /* each viz layer */
+  .viz-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+  }
+  .viz-layer.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .viz-layer iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .viz-layer.chart-layer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--blue);
+  }
+
+  /* hero layer */
+  .hero-layer {
+    background: var(--blue);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .hero-flag {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 36px;
+    opacity: 0.35;
+  }
+  .flag-star {
+    width: 20px; height: 20px;
+    background: var(--red);
+    clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  }
+  .hero-layer h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 62px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+  .hero-layer h1 em {
+    font-style: normal;
+    color: var(--red);
+  }
+  .hero-layer p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 36px;
+  }
+  .hero-scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+    animation: pulse-down 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-down {
+    0%, 100% { transform: scaleY(1); opacity: 0.4; }
+    50%       { transform: scaleY(1.3); opacity: 0.9; }
+  }
+
+  /* ── STORY STEPS (scrollable overlay) ───────────── */
+  .story-steps {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    /* first step starts after hero (100vh) */
+    margin-top: calc(-100vh + 56px);
+  }
+
+  .step {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 60px 60px 60px calc(60% + 20px); /* card on right side */
+    pointer-events: none;
+  }
+  .step:nth-child(odd) {
+    padding: 60px calc(60% + 20px) 60px 60px; /* alternate left */
+    justify-content: flex-start;
+  }
+
+  .step-card {
+    pointer-events: all;
+    background: var(--card-bg);
+    border-radius: 4px;
+    padding: 36px 40px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: var(--shadow);
+    border-top: 3px solid var(--blue);
+    position: relative;
+  }
+  .step-card.accent-red { border-top-color: var(--red); }
+
+  .step-number {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 12px;
+  }
+  .step-card.accent-red .step-number { color: var(--red); }
+
+  .step-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .step-card p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #444;
+  }
+  .step-card p + p { margin-top: 10px; }
+
+  .stat-row {
+    display: flex;
+    gap: 20px;
+    margin: 18px 0;
+  }
+  .stat-block {
+    flex: 1;
+    background: var(--off-white);
+    border-radius: 3px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--blue);
+    line-height: 1;
+  }
+  .stat-block.red .stat-num { color: var(--red); }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 2px;
+    background: var(--off-white);
+    color: var(--blue);
+    text-transform: uppercase;
+  }
+  .tag.red { background: #fde8ec; color: var(--red); }
+
+  .divider {
+    width: 32px;
+    height: 2px;
+    background: var(--blue);
+    margin: 16px 0;
+  }
+  .step-card.accent-red .divider { background: var(--red); }
+
+  /* feature importance bars */
+  .feat-bar-list { margin-top: 16px; }
+  .feat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .feat-label {
+    font-size: 12px;
+    color: var(--text);
+    width: 160px;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+  .feat-bar-wrap {
+    flex: 1;
+    background: var(--off-white);
+    border-radius: 2px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .feat-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--blue);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .feat-bar.red { background: var(--red); }
+  .feat-val {
+    font-size: 11px;
+    color: var(--muted);
+    width: 38px;
+    text-align: right;
+  }
+  .feat-row.active .feat-bar { transform: scaleX(1); }
+
+  /* final CTA */
+  .final-step {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    background: var(--blue);
+    position: relative;
+    z-index: 2;
+  }
+  .final-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 52px 56px;
+    max-width: 680px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .final-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+  }
+  .final-card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #555;
+    margin-bottom: 32px;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--blue);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--blue-mid); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--blue);
+    border: 1.5px solid var(--blue);
+  }
+  .btn-secondary:hover { background: var(--off-white); }
+  .btn-red {
+    background: var(--red);
+    color: var(--white);
+  }
+  .btn-red:hover { background: #c20025; }
+
+  .next-steps {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid #eee;
+    text-align: left;
+  }
+  .next-steps h3 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .next-steps ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .next-steps li {
+    font-size: 13px;
+    color: #444;
+    padding-left: 16px;
+    position: relative;
+  }
+  .next-steps li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--blue);
+    font-size: 12px;
+  }
+
+  /* chart canvases */
+  .chart-wrap {
+    width: min(680px, 90vw);
+    background: var(--white);
+    border-radius: 4px;
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+  }
+  .chart-wrap h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .chart-wrap .chart-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  canvas { display: block; width: 100% !important; }
+
+  /* progress bar */
+  .progress-bar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    height: 2px;
+    background: var(--red);
+    z-index: 1001;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">Chicago Crash Analysis</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#spatial">Maps</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="https://github.com/ckucewicz/traffic_crash_prediction" target="_blank">GitHub</a></li>
+  </ul>
+</nav>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ── SCROLLY CONTAINER ──────────────────────────── -->
+<div class="scrolly-container">
+
+  <!-- STICKY MAP PANE -->
+  <div class="map-pane" id="mapPane">
+
+    <!-- Layer 0: Hero -->
+    <div class="viz-layer hero-layer active" id="layer-hero">
+      <div class="hero-flag">
+        <div class="flag-star"></div>
+        <div class="flag-star"></div>
+        <div class="flag-star"></div>
+        <div class="flag-star"></div>
+      </div>
+      <h1>Predicting Serious Injuries in <em>Chicago</em> Traffic Crashes</h1>
+      <p>A machine learning case study using 900K+ crash records from Chicago's Open Data Portal — combining interpretable modeling, spatial analysis, and policy-relevant insights.</p>
+      <div class="hero-scroll-hint">
+        <span>Scroll to explore</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </div>
+
+    <!-- Layer 1: Target distribution chart -->
+    <div class="viz-layer chart-layer" id="layer-chart">
+      <div class="chart-wrap">
+        <h3>Target Class Distribution</h3>
+        <p class="chart-sub">Serious injuries (fatal or incapacitating) account for less than 2% of all crashes in the cleaned dataset</p>
+        <canvas id="targetChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Layer 2: Heatmap iframe -->
+    <div class="viz-layer" id="layer-heatmap">
+      <iframe src="docs/maps/heatmap.html" title="Crash density heatmap" loading="lazy"></iframe>
+    </div>
+
+    <!-- Layer 3: Severity map iframe -->
+    <div class="viz-layer" id="layer-severity">
+      <iframe src="docs/maps/severity_map.html" title="Crash severity map" loading="lazy"></iframe>
+    </div>
+
+    <!-- Layer 4: Choropleth iframe -->
+    <div class="viz-layer" id="layer-choropleth">
+      <iframe src="docs/maps/choropleth.html" title="Community area choropleth" loading="lazy"></iframe>
+    </div>
+
+    <!-- Layer 5: Feature importance chart -->
+    <div class="viz-layer chart-layer" id="layer-features">
+      <div class="chart-wrap">
+        <h3>Top Feature Importances</h3>
+        <p class="chart-sub">Decision tree model — contribution to reducing entropy across splits</p>
+        <div class="feat-bar-list" id="featBars">
+          <div class="feat-row" data-val="0.0625" data-color="blue">
+            <span class="feat-label">Airbag — Not Deployed</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:100%"></div></div>
+            <span class="feat-val">0.063</span>
+          </div>
+          <div class="feat-row" data-val="0.0499" data-color="muted">
+            <span class="feat-label">Crash Cause — Unknown/Other</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:79.8%"></div></div>
+            <span class="feat-val">0.050</span>
+          </div>
+          <div class="feat-row" data-val="0.0437" data-color="red">
+            <span class="feat-label">Sex — Male</span>
+            <div class="feat-bar-wrap"><div class="feat-bar red" style="width:69.9%"></div></div>
+            <span class="feat-val">0.044</span>
+          </div>
+          <div class="feat-row" data-val="0.0414" data-color="blue">
+            <span class="feat-label">Season — Summer</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:66.2%"></div></div>
+            <span class="feat-val">0.041</span>
+          </div>
+          <div class="feat-row" data-val="0.0397" data-color="blue">
+            <span class="feat-label">Season — Winter</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:63.5%"></div></div>
+            <span class="feat-val">0.040</span>
+          </div>
+          <div class="feat-row" data-val="0.0391" data-color="blue">
+            <span class="feat-label">Season — Spring</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:62.6%"></div></div>
+            <span class="feat-val">0.039</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /map-pane -->
+
+  <!-- ── STORY STEPS ──────────────────────────────── -->
+  <div class="story-steps">
+
+    <!-- Step 1: The Problem -->
+    <div class="step" id="problem" data-layer="layer-chart">
+      <div class="step-card">
+        <div class="step-number">01 — The Problem</div>
+        <h2>A City Working Toward Zero Traffic Deaths</h2>
+        <div class="divider"></div>
+        <p>In 2023, Chicago recorded 136 traffic deaths. In response, the city launched its <strong>Vision Zero Action Plan</strong> in 2017, committing to eliminate traffic fatalities and serious injuries by 2026.</p>
+        <p>Traffic safety is also an equity issue — Black and Brown communities on Chicago's South and West Sides bear a disproportionate share of crash hospitalizations.</p>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-num">900K+</div>
+            <div class="stat-label">Crash records</div>
+          </div>
+          <div class="stat-block red">
+            <div class="stat-num">~2%</div>
+            <div class="stat-label">Serious injuries</div>
+          </div>
+        </div>
+        <p>This severe class imbalance makes standard accuracy metrics unreliable. The model uses <strong>Precision-Recall AUC</strong> instead.</p>
+        <div class="tag-list">
+          <span class="tag">Binary Classification</span>
+          <span class="tag red">Class Imbalance</span>
+          <span class="tag">SMOTE</span>
+          <span class="tag">PR AUC</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Crash density -->
+    <div class="step" id="spatial" data-layer="layer-heatmap">
+      <div class="step-card accent-red">
+        <div class="step-number">02 — Spatial Analysis</div>
+        <h2>Where Do Crashes Concentrate?</h2>
+        <div class="divider"></div>
+        <p>Crash density clusters heavily along Chicago's major north-south arterials — <strong>Western, Pulaski, and Cicero Avenues</strong> — and throughout the downtown Loop corridor.</p>
+        <p>These hotspots align with high traffic volume, but volume alone doesn't explain injury severity. The next maps dig deeper.</p>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-num">894K</div>
+            <div class="stat-label">Georeferenced crashes</div>
+          </div>
+          <div class="stat-block red">
+            <div class="stat-num">77</div>
+            <div class="stat-label">Community areas</div>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--muted); margin-top:8px;">↑ Interact with the map directly — zoom, pan, explore.</p>
+      </div>
+    </div>
+
+    <!-- Step 3: Severity map -->
+    <div class="step" data-layer="layer-severity">
+      <div class="step-card">
+        <div class="step-number">03 — Severity Patterns</div>
+        <h2>Serious Crashes Are Spread Differently Than Volume</h2>
+        <div class="divider"></div>
+        <p><span style="color:var(--red); font-weight:500;">Red points</span> mark fatal or incapacitating crashes. <span style="color:#4393c3; font-weight:500;">Blue points</span> are non-serious. Toggle the layers using the map controls.</p>
+        <p>Serious crashes are not simply a function of where crashes are most frequent. They spread into residential areas and corridors with fewer overall incidents, suggesting road design and speed environment play a larger role than raw volume.</p>
+        <div class="stat-row">
+          <div class="stat-block red">
+            <div class="stat-num">16K+</div>
+            <div class="stat-label">Serious crashes mapped</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">54.4%</div>
+            <div class="stat-label">Involve male drivers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Choropleth -->
+    <div class="step" data-layer="layer-choropleth">
+      <div class="step-card accent-red">
+        <div class="step-number">04 — Neighborhood Equity</div>
+        <h2>Serious Injury Rates Vary Sharply by Neighborhood</h2>
+        <div class="divider"></div>
+        <p>Aggregating to Chicago's 77 community areas reveals a pattern that crash counts alone obscure: <strong>some lower-volume neighborhoods have significantly higher serious injury rates</strong>.</p>
+        <p>Communities on the South and West Sides — which face documented underinvestment in traffic infrastructure — show elevated rates, reinforcing the equity framing of Chicago's Vision Zero plan.</p>
+        <p>Hover over any neighborhood to see total crashes, serious crashes, and the serious injury rate.</p>
+        <div class="tag-list">
+          <span class="tag red">Equity</span>
+          <span class="tag">GeoPandas</span>
+          <span class="tag">Spatial Join</span>
+          <span class="tag">Choropleth</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Feature importances -->
+    <div class="step" id="model" data-layer="layer-features">
+      <div class="step-card">
+        <div class="step-number">05 — Model Insights</div>
+        <h2>What Predicts a Serious Crash?</h2>
+        <div class="divider"></div>
+        <p>A decision tree model (PR AUC = 0.096) was selected for its interpretability — essential for policy audiences who need to understand and trust model outputs.</p>
+        <p><strong>Airbag non-deployment</strong> is the top predictor, likely acting as a proxy for vehicle speed and size at impact. <strong>Male sex</strong> and <strong>seasonal extremes</strong> also contribute meaningfully.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:10px;">Note: feature importances reflect entropy reduction, not effect direction or magnitude.</p>
+        <div class="tag-list">
+          <span class="tag">Decision Tree</span>
+          <span class="tag">Entropy / Info Gain</span>
+          <span class="tag red">White-box Model</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /story-steps -->
+</div><!-- /scrolly-container -->
+
+<!-- FINAL CTA -->
+<div class="final-step">
+  <div class="final-card">
+    <h2>Policy Recommendations</h2>
+    <p>The model and spatial analysis together support three actionable directions for CDOT, CMAP, and Cook County transportation agencies.</p>
+    <div class="btn-row">
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb" target="_blank" class="btn btn-primary">Full Notebook</a>
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/spatial_analysis.ipynb" target="_blank" class="btn btn-secondary">Spatial Notebook</a>
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf" target="_blank" class="btn btn-red">Presentation</a>
+    </div>
+    <div class="next-steps">
+      <h3>Recommendations</h3>
+      <ul>
+        <li>Require annual airbag inspections — particularly for vehicles registered in high-rate community areas</li>
+        <li>Introduce tiered weight fees for heavy personal vehicles (trucks, SUVs) to reduce impact forces in urban crashes</li>
+        <li>Target male driver safety campaigns toward aggressive/reckless driving behaviors flagged by the model</li>
+        <li>Prioritize Vision Zero infrastructure investment in neighborhoods with high serious-injury rates, not just high crash counts</li>
+        <li>Integrate spatial features (proximity to signals, speed cameras) directly into future model iterations</li>
+      </ul>
+    </div>
+    <p style="margin-top:28px; font-size:13px; color:#999;">
+      By <a href="https://www.linkedin.com/in/chriskucewicz/" style="color:var(--blue);">Chris Kucewicz</a> &nbsp;·&nbsp;
+      <a href="mailto:cfkucewicz@gmail.com" style="color:var(--blue);">cfkucewicz@gmail.com</a> &nbsp;·&nbsp;
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction" style="color:var(--blue);">GitHub</a>
+    </p>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ── Target distribution chart ────────────────────────
+const ctx = document.getElementById('targetChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Non-Serious Injury', 'Serious Injury\n(Fatal / Incapacitating)'],
+    datasets: [{
+      data: [94085, 1834],
+      backgroundColor: ['#003087', '#E4002B'],
+      borderRadius: 3,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed.y.toLocaleString()} crashes`
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: {
+          callback: v => v >= 1000 ? (v/1000)+'k' : v,
+          font: { family: 'DM Sans', size: 11 },
+          color: '#888'
+        },
+        grid: { color: '#f0f0f0' },
+        border: { display: false }
+      },
+      x: {
+        ticks: { font: { family: 'DM Sans', size: 12 }, color: '#444' },
+        grid: { display: false },
+        border: { display: false }
+      }
+    }
+  }
+});
+
+// ── Scrollytelling engine ────────────────────────────
+const layers   = document.querySelectorAll('.viz-layer');
+const steps    = document.querySelectorAll('[data-layer]');
+const progress = document.getElementById('progressBar');
+const featRows = document.querySelectorAll('.feat-row');
+
+function showLayer(id) {
+  layers.forEach(l => l.classList.toggle('active', l.id === id));
+  // trigger feat bar animation when features layer shown
+  if (id === 'layer-features') {
+    setTimeout(() => featRows.forEach(r => r.classList.add('active')), 200);
+  } else {
+    featRows.forEach(r => r.classList.remove('active'));
+  }
+}
+
+// IntersectionObserver — fire when step is ~30% into viewport
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      showLayer(entry.target.dataset.layer);
+    }
+  });
+}, { threshold: 0.3, rootMargin: '0px 0px -20% 0px' });
+
+steps.forEach(s => observer.observe(s));
+
+// Start on hero
+showLayer('layer-hero');
+
+// Scroll progress bar
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (scrollTop / docHeight * 100) + '%';
+});
+</script>
+</body>
+</html>
