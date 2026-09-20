@@ -3,781 +3,775 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bike Lanes & Housing — Chicago</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<title>Chicago Traffic Crash Analysis — Chris Kucewicz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue:    #0d2b45;
+    --blue-dark: #0a2a4a;
+    --blue-mid:#0d2b45;
+    --red:     #EF002B;
+    --white:   #FFFFFF;
+    --off-white:#F5F5F3;
+    --text:    #1a1a1a;
+    --muted:   #666;
+    --card-bg: rgba(255,255,255,0.97);
+    --shadow:  0 4px 32px rgba(0,0,0,0.13);
+  }
 
-:root {
-  --bg: #f5f4f0;
-  --surface: #ffffff;
-  --border: #e4e2dc;
-  --text-primary: #1c1b18;
-  --text-secondary: #6b6860;
-  --text-hint: #aaa89f;
-  --accent: #2d6a4f;
-  --accent-light: #e6f2ec;
-  --font: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text-primary);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.5;
-}
+  html { scroll-behavior: smooth; }
 
-/* ── Header ── */
-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 18px 40px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-header h1 { font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
-header p  { font-size: 13px; color: var(--text-secondary); }
-.tag {
-  font-family: var(--mono);
-  font-size: 10px;
-  background: var(--accent-light);
-  color: var(--accent);
-  padding: 3px 8px;
-  border-radius: 3px;
-  letter-spacing: 0.05em;
-  margin-left: auto;
-}
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--text);
+    background: #41B6E6;
+    overflow-x: hidden;
+  }
 
-/* ── Nav ── */
-nav {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 40px;
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-}
-nav button {
-  font-family: var(--font);
-  font-size: 13px;
-  color: var(--text-secondary);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 12px 18px;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-  white-space: nowrap;
-}
-nav button:hover { color: var(--text-primary); }
-nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+  /* ── NAV ─────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 56px;
+    background: #41B6E6;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
 
-/* ── Layout ── */
-main { padding: 28px 40px; max-width: 1200px; margin: 0 auto; }
-.panel { display: none; animation: fadein 0.2s ease; }
-.panel.active { display: block; }
-@keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  /* ── SCROLLY LAYOUT ──────────────────────────────── */
+  .scrolly-container {
+    position: relative;
+  }
 
-.panel-header { margin-bottom: 20px; }
-.panel-header h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-.panel-header p  { font-size: 13px; color: var(--text-secondary); max-width: 580px; }
+  /* sticky map pane */
+  .map-pane {
+    position: sticky;
+    top: 56px;
+    width: 100%;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    background: #41B6E6;
+    z-index: 1;
+  }
 
-/* ── Controls ── */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-.controls label { font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.05em; }
-.btn-group { display: flex; gap: 3px; }
-.btn-group button {
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-secondary);
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.12s;
-}
-.btn-group button:hover { border-color: var(--accent); color: var(--accent); }
-.btn-group button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  /* each viz layer */
+  .viz-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+  }
+  .viz-layer.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .viz-layer iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .viz-layer.chart-layer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #41B6E6;
+  }
 
-/* ── Cards ── */
-.chart-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 24px;
-}
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+  /* hero layer */
+  .hero-layer {
+    background: #41B6E6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .hero-flag {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 36px;
+    opacity: 0.35;
+  }
+  .flag-star {
+    width: 20px; height: 20px;
+    background: var(--red);
+    clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  }
+  .hero-layer h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 62px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+  .hero-layer h1 em {
+    font-style: normal;
+    color: var(--red);
+  }
+  .hero-layer p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 36px;
+  }
+  .hero-scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+    animation: pulse-down 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-down {
+    0%, 100% { transform: scaleY(1); opacity: 0.4; }
+    50%       { transform: scaleY(1.3); opacity: 0.9; }
+  }
 
-.chart-label { font-size: 13px; font-weight: 500; margin-bottom: 14px; }
+  /* ── STORY STEPS (scrollable overlay) ───────────── */
+  .story-steps {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    /* first step starts after hero (100vh) */
+    margin-top: calc(-100vh + 56px);
+  }
 
-/* ── Stats ── */
-.stat-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.stat {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 18px;
-  flex: 1;
-  min-width: 130px;
-}
-.stat-val   { font-family: var(--mono); font-size: 20px; font-weight: 500; margin-bottom: 2px; }
-.stat-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.03em; }
+  .step {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 60px 60px 60px calc(60% + 20px); /* card on right side */
+    pointer-events: none;
+  }
+  .step:nth-child(odd) {
+    padding: 60px calc(60% + 20px) 60px 60px; /* alternate left */
+    justify-content: flex-start;
+  }
 
-/* ── Legend ── */
-.legend { display: flex; align-items: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
-.legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  .step-card {
+    pointer-events: all;
+    background: var(--card-bg);
+    border-radius: 4px;
+    padding: 36px 40px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: var(--shadow);
+    border-top: 3px solid #0d2b45;
+    position: relative;
+  }
+  .step-card.accent-red { border-top-color: var(--red); }
 
-/* ── Tooltip ── */
-.tooltip {
-  position: fixed;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 10px 14px;
-  font-size: 12px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.1s;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.09);
-  z-index: 200;
-  max-width: 220px;
-  line-height: 1.65;
-}
-.tooltip .tt-title { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
-.tooltip .tt-row   { display: flex; justify-content: space-between; gap: 12px; }
-.tooltip .tt-val   { font-family: var(--mono); font-weight: 500; }
+  .step-number {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #0d7aad;
+    margin-bottom: 12px;
+  }
+  .step-card.accent-red .step-number { color: var(--red); }
 
-/* ── Note ── */
-.note { font-size: 11px; color: var(--text-hint); margin-top: 10px; font-style: italic; }
+  .step-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .step-card p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #444;
+  }
+  .step-card p + p { margin-top: 10px; }
 
-/* ── Loading ── */
-#loading {
-  position: fixed; inset: 0;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 12px; z-index: 999;
-}
-#loading p { font-size: 13px; color: var(--text-secondary); }
-.spinner {
-  width: 28px; height: 28px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+  .stat-row {
+    display: flex;
+    gap: 20px;
+    margin: 18px 0;
+  }
+  .stat-block {
+    flex: 1;
+    background: var(--off-white);
+    border-radius: 3px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #0d7aad;
+    line-height: 1;
+  }
+  .stat-block.red .stat-num { color: var(--red); }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
 
-svg text { font-family: var(--font); }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 2px;
+    background: var(--off-white);
+    color: var(--blue);
+    text-transform: uppercase;
+  }
+  .tag.red { background: #fde8ec; color: var(--red); }
+
+  .divider {
+    width: 32px;
+    height: 2px;
+    background: #41B6E6;
+    margin: 16px 0;
+  }
+  .step-card.accent-red .divider { background: var(--red); }
+
+  /* feature importance bars */
+  .feat-bar-list { margin-top: 16px; }
+  .feat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .feat-label {
+    font-size: 12px;
+    color: var(--text);
+    width: 160px;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+  .feat-bar-wrap {
+    flex: 1;
+    background: var(--off-white);
+    border-radius: 2px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .feat-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: #41B6E6;
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .feat-bar.red { background: var(--red); }
+  .feat-val {
+    font-size: 11px;
+    color: var(--muted);
+    width: 38px;
+    text-align: right;
+  }
+  .feat-row.active .feat-bar { transform: scaleX(1); }
+
+  /* final CTA */
+  .final-step {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    background: #41B6E6;
+    position: relative;
+    z-index: 2;
+  }
+  .final-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 52px 56px;
+    max-width: 680px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .final-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+  }
+  .final-card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #555;
+    margin-bottom: 32px;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: #41B6E6;
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--blue-mid); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--blue);
+    border: 1.5px solid var(--blue);
+  }
+  .btn-secondary:hover { background: var(--off-white); }
+  .btn-red {
+    background: var(--red);
+    color: var(--white);
+  }
+  .btn-red:hover { background: #c20025; }
+
+  .next-steps {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid #eee;
+    text-align: left;
+  }
+  .next-steps h3 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .next-steps ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .next-steps li {
+    font-size: 13px;
+    color: #444;
+    padding-left: 16px;
+    position: relative;
+  }
+  .next-steps li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--blue);
+    font-size: 12px;
+  }
+
+  /* chart canvases */
+  .chart-wrap {
+    width: min(680px, 90vw);
+    background: var(--white);
+    border-radius: 4px;
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+  }
+  .chart-wrap h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .chart-wrap .chart-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  canvas { display: block; width: 100% !important; }
+
+  /* progress bar */
+  .progress-bar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    height: 2px;
+    background: var(--red);
+    z-index: 1001;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
 </style>
 </head>
 <body>
 
-<div id="loading">
-  <div class="spinner"></div>
-  <p>Loading Chicago tract data…</p>
-</div>
-
-<header>
-  <div>
-    <h1>Bike Lanes &amp; Housing Costs in Chicago</h1>
-  </div>
-  <p>Cook County census tracts &middot; 2012–2022</p>
-  <span class="tag">DVS MENTORSHIP</span>
-</header>
-
+<!-- NAV -->
 <nav>
-  <button class="active" onclick="showPanel('geo',this)">Geographic snapshot</button>
-  <button onclick="showPanel('change',this)">Change map</button>
-  <button onclick="showPanel('trends',this)">Rent trends</button>
-  <button onclick="showPanel('scatter',this)">&#916;bike vs &#916;rent</button>
+  <a class="nav-brand" href="#">Chicago Crash Analysis</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#spatial">Maps</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="https://github.com/ckucewicz/traffic_crash_prediction" target="_blank">GitHub</a></li>
+  </ul>
 </nav>
 
-<main>
+<div class="progress-bar" id="progressBar"></div>
 
-  <!-- ── Panel 1: Geographic snapshot ── -->
-  <div class="panel active" id="geo">
-    <div class="panel-header">
-      <h2>Median rent by census tract</h2>
-      <p>Spatial distribution of rent across Cook County. Toggle year and metric to explore how the landscape shifted from 2012 to 2022.</p>
-    </div>
-    <div class="controls">
-      <label>YEAR</label>
-      <div class="btn-group">
-        <button class="active" onclick="setGeoYear(2012,this)">2012</button>
-        <button onclick="setGeoYear(2016,this)">2016</button>
-        <button onclick="setGeoYear(2022,this)">2022</button>
-      </div>
-      <label style="margin-left:12px">COLOR BY</label>
-      <div class="btn-group">
-        <button class="active" onclick="setGeoMetric('median_rent',this)">Median rent</button>
-        <button onclick="setGeoMetric('bike_length_km',this)">Bike lane km</button>
-        <button onclick="setGeoMetric('pct_white_nonhisp',this)">% White non-Hisp</button>
-      </div>
-    </div>
-    <div class="chart-wrap">
-      <svg id="geo-svg" style="width:100%;display:block"></svg>
-      <div class="legend" id="geo-legend"></div>
-    </div>
-  </div>
+<!-- ── SCROLLY CONTAINER ──────────────────────────── -->
+<div class="scrolly-container">
 
-  <!-- ── Panel 2: Change map ── -->
-  <div class="panel" id="change">
-    <div class="panel-header">
-      <h2>Change 2012 → 2022</h2>
-      <p>Which tracts saw the largest rent increases, and did they also gain bike lane infrastructure? Compare the two maps side by side.</p>
+  <!-- STICKY MAP PANE -->
+  <div class="map-pane" id="mapPane">
+
+    <!-- Layer 0: Hero -->
+    <div class="viz-layer hero-layer active" id="layer-hero">
+      <div class="hero-flag">
+        <div class="flag-star"></div>
+        <div class="flag-star"></div>
+        <div class="flag-star"></div>
+        <div class="flag-star"></div>
+      </div>
+      <h1>Predicting Serious Injuries in <em>Chicago</em> Traffic Crashes</h1>
+      <p>A machine learning case study using 900K+ crash records from Chicago's Open Data Portal — combining interpretable modeling, spatial analysis, and policy-relevant insights.</p>
+      <div class="hero-scroll-hint">
+        <span>Scroll to explore</span>
+        <div class="scroll-arrow"></div>
+      </div>
     </div>
-    <div class="two-col">
+
+    <!-- Layer 1: Target distribution chart -->
+    <div class="viz-layer chart-layer" id="layer-chart">
       <div class="chart-wrap">
-        <div class="chart-label">&#916; Median rent ($)</div>
-        <svg id="change-rent-svg" style="width:100%;display:block"></svg>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#b2182b"></div>Large increase</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#f7f7f7;border:1px solid #ccc"></div>No change</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#2166ac"></div>Decrease</div>
+        <h3>Target Class Distribution</h3>
+        <p class="chart-sub">Serious injuries (fatal or incapacitating) account for less than 2% of all crashes in the cleaned dataset</p>
+        <canvas id="targetChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Layer 2: Heatmap iframe -->
+    <div class="viz-layer" id="layer-heatmap">
+      <iframe src="docs/maps/heatmap.html" title="Crash density heatmap" loading="lazy"></iframe>
+    </div>
+
+    <!-- Layer 3: Severity map iframe -->
+    <div class="viz-layer" id="layer-severity">
+      <iframe src="docs/maps/severity_map.html" title="Crash severity map" loading="lazy"></iframe>
+    </div>
+
+    <!-- Layer 4: Choropleth iframe -->
+    <div class="viz-layer" id="layer-choropleth">
+      <iframe src="docs/maps/choropleth.html" title="Community area choropleth" loading="lazy"></iframe>
+    </div>
+
+    <!-- Layer 5: Feature importance chart -->
+    <div class="viz-layer chart-layer" id="layer-features">
+      <div class="chart-wrap">
+        <h3>Top Feature Importances</h3>
+        <p class="chart-sub">Decision tree model — contribution to reducing entropy across splits</p>
+        <div class="feat-bar-list" id="featBars">
+          <div class="feat-row" data-val="0.0625" data-color="blue">
+            <span class="feat-label">Airbag — Not Deployed</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:100%"></div></div>
+            <span class="feat-val">0.063</span>
+          </div>
+          <div class="feat-row" data-val="0.0499" data-color="muted">
+            <span class="feat-label">Crash Cause — Unknown/Other</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:79.8%"></div></div>
+            <span class="feat-val">0.050</span>
+          </div>
+          <div class="feat-row" data-val="0.0437" data-color="red">
+            <span class="feat-label">Sex — Male</span>
+            <div class="feat-bar-wrap"><div class="feat-bar red" style="width:69.9%"></div></div>
+            <span class="feat-val">0.044</span>
+          </div>
+          <div class="feat-row" data-val="0.0414" data-color="blue">
+            <span class="feat-label">Season — Summer</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:66.2%"></div></div>
+            <span class="feat-val">0.041</span>
+          </div>
+          <div class="feat-row" data-val="0.0397" data-color="blue">
+            <span class="feat-label">Season — Winter</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:63.5%"></div></div>
+            <span class="feat-val">0.040</span>
+          </div>
+          <div class="feat-row" data-val="0.0391" data-color="blue">
+            <span class="feat-label">Season — Spring</span>
+            <div class="feat-bar-wrap"><div class="feat-bar" style="width:62.6%"></div></div>
+            <span class="feat-val">0.039</span>
+          </div>
         </div>
       </div>
-      <div class="chart-wrap">
-        <div class="chart-label">&#916; Bike lane km</div>
-        <svg id="change-bike-svg" style="width:100%;display:block"></svg>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-swatch" style="background:#2d6a4f"></div>Lanes added</div>
-          <div class="legend-item"><div class="legend-swatch" style="background:#e8e6e0;border:1px solid #ccc"></div>No change</div>
+    </div>
+
+  </div><!-- /map-pane -->
+
+  <!-- ── STORY STEPS ──────────────────────────────── -->
+  <div class="story-steps">
+
+    <!-- Step 1: The Problem -->
+    <div class="step" id="problem" data-layer="layer-chart">
+      <div class="step-card">
+        <div class="step-number">01 — The Problem</div>
+        <h2>A City Working Toward Zero Traffic Deaths</h2>
+        <div class="divider"></div>
+        <p>In 2023, Chicago recorded 136 traffic deaths. In response, the city launched its <strong>Vision Zero Action Plan</strong> in 2017, committing to eliminate traffic fatalities and serious injuries by 2026.</p>
+        <p>Traffic safety is also an equity issue — Black and Brown communities on Chicago's South and West Sides bear a disproportionate share of crash hospitalizations.</p>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-num">900K+</div>
+            <div class="stat-label">Crash records</div>
+          </div>
+          <div class="stat-block red">
+            <div class="stat-num">~2%</div>
+            <div class="stat-label">Serious injuries</div>
+          </div>
+        </div>
+        <p>This severe class imbalance makes standard accuracy metrics unreliable. The model uses <strong>Precision-Recall AUC</strong> instead.</p>
+        <div class="tag-list">
+          <span class="tag">Binary Classification</span>
+          <span class="tag red">Class Imbalance</span>
+          <span class="tag">SMOTE</span>
+          <span class="tag">PR AUC</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── Panel 3: Rent trends ── -->
-  <div class="panel" id="trends">
-    <div class="panel-header">
-      <h2>Rent trajectories 2012–2022</h2>
-      <p>Did tracts with bike lane infrastructure see different rent growth? Toggle the grouping to compare.</p>
-    </div>
-    <div class="controls">
-      <label>GROUP BY</label>
-      <div class="btn-group">
-        <button class="active" onclick="setTrendGroup('bike',this)">Bike lane presence</button>
-        <button onclick="setTrendGroup('income',this)">Income quartile</button>
+    <!-- Step 2: Crash density -->
+    <div class="step" id="spatial" data-layer="layer-heatmap">
+      <div class="step-card accent-red">
+        <div class="step-number">02 — Spatial Analysis</div>
+        <h2>Where Do Crashes Concentrate?</h2>
+        <div class="divider"></div>
+        <p>Crash density clusters heavily along Chicago's major north-south arterials — <strong>Western, Pulaski, and Cicero Avenues</strong> — and throughout the downtown Loop corridor.</p>
+        <p>These hotspots align with high traffic volume, but volume alone doesn't explain injury severity. The next maps dig deeper.</p>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-num">894K</div>
+            <div class="stat-label">Georeferenced crashes</div>
+          </div>
+          <div class="stat-block red">
+            <div class="stat-num">77</div>
+            <div class="stat-label">Community areas</div>
+          </div>
+        </div>
+        <p style="font-size:12px; color:var(--muted); margin-top:8px;">↑ Interact with the map directly — zoom, pan, explore.</p>
       </div>
     </div>
-    <div class="stat-row" id="trend-stats"></div>
-    <div class="chart-wrap">
-      <svg id="trend-svg" style="width:100%;display:block"></svg>
-      <p class="note">Lines show median rent across tracts in each group across the three survey years.</p>
+
+    <!-- Step 3: Severity map -->
+    <div class="step" data-layer="layer-severity">
+      <div class="step-card">
+        <div class="step-number">03 — Severity Patterns</div>
+        <h2>Serious Crashes Are Spread Differently Than Volume</h2>
+        <div class="divider"></div>
+        <p><span style="color:var(--red); font-weight:500;">Red points</span> mark fatal or incapacitating crashes. <span style="color:#4393c3; font-weight:500;">Blue points</span> are non-serious. Toggle the layers using the map controls.</p>
+        <p>Serious crashes are not simply a function of where crashes are most frequent. They spread into residential areas and corridors with fewer overall incidents, suggesting road design and speed environment play a larger role than raw volume.</p>
+        <div class="stat-row">
+          <div class="stat-block red">
+            <div class="stat-num">16K+</div>
+            <div class="stat-label">Serious crashes mapped</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">54.4%</div>
+            <div class="stat-label">Involve male drivers</div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Step 4: Choropleth -->
+    <div class="step" data-layer="layer-choropleth">
+      <div class="step-card accent-red">
+        <div class="step-number">04 — Neighborhood Equity</div>
+        <h2>Serious Injury Rates Vary Sharply by Neighborhood</h2>
+        <div class="divider"></div>
+        <p>Aggregating to Chicago's 77 community areas reveals a pattern that crash counts alone obscure: <strong>some lower-volume neighborhoods have significantly higher serious injury rates</strong>.</p>
+        <p>Communities on the South and West Sides — which face documented underinvestment in traffic infrastructure — show elevated rates, reinforcing the equity framing of Chicago's Vision Zero plan.</p>
+        <p>Hover over any neighborhood to see total crashes, serious crashes, and the serious injury rate.</p>
+        <div class="tag-list">
+          <span class="tag red">Equity</span>
+          <span class="tag">GeoPandas</span>
+          <span class="tag">Spatial Join</span>
+          <span class="tag">Choropleth</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Feature importances -->
+    <div class="step" id="model" data-layer="layer-features">
+      <div class="step-card">
+        <div class="step-number">05 — Model Insights</div>
+        <h2>What Predicts a Serious Crash?</h2>
+        <div class="divider"></div>
+        <p>A decision tree model (PR AUC = 0.096) was selected for its interpretability — essential for policy audiences who need to understand and trust model outputs.</p>
+        <p><strong>Airbag non-deployment</strong> is the top predictor, likely acting as a proxy for vehicle speed and size at impact. <strong>Male sex</strong> and <strong>seasonal extremes</strong> also contribute meaningfully.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:10px;">Note: feature importances reflect entropy reduction, not effect direction or magnitude.</p>
+        <div class="tag-list">
+          <span class="tag">Decision Tree</span>
+          <span class="tag">Entropy / Info Gain</span>
+          <span class="tag red">White-box Model</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /story-steps -->
+</div><!-- /scrolly-container -->
+
+<!-- FINAL CTA -->
+<div class="final-step">
+  <div class="final-card">
+    <h2>Policy Recommendations</h2>
+    <p>The model and spatial analysis together support three actionable directions for CDOT, CMAP, and Cook County transportation agencies.</p>
+    <div class="btn-row">
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb" target="_blank" class="btn btn-primary">Full Notebook</a>
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/spatial_analysis.ipynb" target="_blank" class="btn btn-secondary">Spatial Notebook</a>
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/presentation.pdf" target="_blank" class="btn btn-red">Presentation</a>
+    </div>
+    <div class="next-steps">
+      <h3>Recommendations</h3>
+      <ul>
+        <li>Require annual airbag inspections — particularly for vehicles registered in high-rate community areas</li>
+        <li>Introduce tiered weight fees for heavy personal vehicles (trucks, SUVs) to reduce impact forces in urban crashes</li>
+        <li>Target male driver safety campaigns toward aggressive/reckless driving behaviors flagged by the model</li>
+        <li>Prioritize Vision Zero infrastructure investment in neighborhoods with high serious-injury rates, not just high crash counts</li>
+        <li>Integrate spatial features (proximity to signals, speed cameras) directly into future model iterations</li>
+      </ul>
+    </div>
+    <p style="margin-top:28px; font-size:13px; color:#999;">
+      By <a href="https://www.linkedin.com/in/chriskucewicz/" style="color:var(--blue);">Chris Kucewicz</a> &nbsp;·&nbsp;
+      <a href="/cdn-cgi/l/email-protection#2d4e4b46584e485a444e576d4a404c4441034e4240" style="color:var(--blue);"><span class="__cf_email__" data-cfemail="7112171a0412140618120b31161c10181d5f121e1c">[email&#160;protected]</span></a> &nbsp;·&nbsp;
+      <a href="https://github.com/ckucewicz/traffic_crash_prediction" style="color:var(--blue);">GitHub</a>
+    </p>
   </div>
+</div>
 
-  <!-- ── Panel 4: Scatter ── -->
-  <div class="panel" id="scatter">
-    <div class="panel-header">
-      <h2>&#916; Bike lane km vs &#916; Median rent (2012–2022)</h2>
-      <p>Each dot is a census tract. The regression line shows the estimated relationship between gaining bike lanes and rent change, controlling for nothing else.</p>
-    </div>
-    <div class="stat-row" id="scatter-stats"></div>
-    <div class="chart-wrap">
-      <svg id="scatter-svg" style="width:100%;display:block"></svg>
-      <p class="note">Color encodes baseline 2012 rent. Hover over dots for tract details.</p>
-    </div>
-  </div>
-
-</main>
-
-<div class="tooltip" id="tooltip"></div>
-
+<!-- Chart.js -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// ============================================================
-// GLOBALS
-// ============================================================
-let geoData, deltaData, panelData;
-let geoYear = 2012, geoMetric = 'median_rent', trendGroup = 'bike';
-const tip = document.getElementById('tooltip');
-
-// ============================================================
-// NAV
-// ============================================================
-function showPanel(id, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if (btn) btn.classList.add('active');
-  // redraw active panel
-  if (id === 'geo')     drawGeo();
-  if (id === 'change')  drawChange();
-  if (id === 'trends')  drawTrends();
-  if (id === 'scatter') drawScatter();
-}
-
-// ============================================================
-// TOOLTIP HELPERS
-// ============================================================
-function showTip(html, event) {
-  tip.innerHTML = html;
-  tip.style.opacity = 1;
-  moveTip(event);
-}
-function moveTip(event) {
-  const x = event.clientX + 14, y = event.clientY - 10;
-  tip.style.left = Math.min(x, window.innerWidth - 230) + 'px';
-  tip.style.top  = Math.min(y, window.innerHeight - 120) + 'px';
-}
-function hideTip() { tip.style.opacity = 0; }
-
-function fmt(v, type) {
-  if (v == null || isNaN(v)) return '—';
-  if (type === 'dollar') return '$' + Math.round(v).toLocaleString();
-  if (type === 'pct')    return (v * 100).toFixed(1) + '%';
-  if (type === 'km')     return v.toFixed(2) + ' km';
-  return v;
-}
-
-// ============================================================
-// LOAD DATA
-// ============================================================
-async function loadData() {
-  const [geo, delta, panel] = await Promise.all([
-    d3.json('data/cook_tracts_panel.geojson'),
-    d3.csv('data/delta.csv', d3.autoType),
-    d3.csv('data/panel_flat.csv', d3.autoType)
-  ]);
-  geoData   = geo;
-  deltaData = delta;
-  panelData = panel;
-
-  document.getElementById('loading').style.display = 'none';
-  drawGeo();
-}
-
-// ============================================================
-// PANEL 1 — GEOGRAPHIC SNAPSHOT
-// ============================================================
-function setGeoYear(y, btn) {
-  geoYear = y;
-  document.querySelectorAll('#geo .btn-group:first-of-type button')
-    .forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  drawGeo();
-}
-function setGeoMetric(m, btn) {
-  geoMetric = m;
-  document.querySelectorAll('#geo .btn-group:last-of-type button')
-    .forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  drawGeo();
-}
-
-function drawGeo() {
-  const svg = d3.select('#geo-svg');
-  svg.selectAll('*').remove();
-
-  const W = svg.node().parentElement.clientWidth - 48;
-  const H = Math.round(W * 0.62);
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-
-  // Filter features to selected year
-  const features = geoData.features.filter(f => f.properties.year === geoYear);
-
-  const projection = d3.geoMercator().fitSize([W, H], { type: 'FeatureCollection', features });
-  const path = d3.geoPath().projection(projection);
-
-  const vals = features.map(f => +f.properties[geoMetric]).filter(v => !isNaN(v) && v > 0);
-  const ext  = d3.extent(vals);
-
-  let colorScale, legendStops, metricLabel;
-  if (geoMetric === 'median_rent') {
-    colorScale  = d3.scaleSequential(d3.interpolateBlues).domain(ext);
-    legendStops = [ext[0], (ext[0]+ext[1])/2, ext[1]];
-    metricLabel = 'Median rent';
-  } else if (geoMetric === 'bike_length_km') {
-    colorScale  = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
-    legendStops = [0, ext[1]/2, ext[1]];
-    metricLabel = 'Bike lane km';
-  } else {
-    colorScale  = d3.scaleSequential(d3.interpolatePurples).domain([0, 1]);
-    legendStops = [0, 0.5, 1];
-    metricLabel = '% White non-Hisp';
+// ── Target distribution chart ────────────────────────
+const ctx = document.getElementById('targetChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Non-Serious Injury', 'Serious Injury\n(Fatal / Incapacitating)'],
+    datasets: [{
+      data: [94085, 1834],
+      backgroundColor: ['#0d2b45', '#EF002B'],
+      borderRadius: 3,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.parsed.y.toLocaleString()} crashes`
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: {
+          callback: v => v >= 1000 ? (v/1000)+'k' : v,
+          font: { family: 'DM Sans', size: 11 },
+          color: '#888'
+        },
+        grid: { color: '#f0f0f0' },
+        border: { display: false }
+      },
+      x: {
+        ticks: { font: { family: 'DM Sans', size: 12 }, color: '#444' },
+        grid: { display: false },
+        border: { display: false }
+      }
+    }
   }
+});
 
-  svg.selectAll('path')
-    .data(features)
-    .join('path')
-    .attr('d', path)
-    .attr('fill', d => {
-      const v = +d.properties[geoMetric];
-      return isNaN(v) ? '#e4e2dc' : colorScale(v);
-    })
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 0.3)
-    .on('mousemove', function(event, d) {
-      const p = d.properties;
-      showTip(`
-        <div class="tt-title">${p.name || p.geoid}</div>
-        <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(p.median_rent,'dollar')}</span></div>
-        <div class="tt-row"><span>Bike lanes</span><span class="tt-val">${fmt(p.bike_length_km,'km')}</span></div>
-        <div class="tt-row"><span>% White</span><span class="tt-val">${fmt(p.pct_white_nonhisp,'pct')}</span></div>
-      `, event);
-    })
-    .on('mouseleave', hideTip);
+// ── Scrollytelling engine ────────────────────────────
+const layers   = document.querySelectorAll('.viz-layer');
+const steps    = document.querySelectorAll('[data-layer]');
+const progress = document.getElementById('progressBar');
+const featRows = document.querySelectorAll('.feat-row');
 
-  // Legend
-  const leg = document.getElementById('geo-legend');
-  leg.innerHTML = `<span style="font-size:11px;color:var(--text-secondary)">${metricLabel}:</span>`;
-  legendStops.forEach(v => {
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = `
-      <div class="legend-swatch" style="background:${colorScale(v)}"></div>
-      <span>${geoMetric === 'median_rent' ? fmt(v,'dollar') : geoMetric === 'bike_length_km' ? fmt(v,'km') : fmt(v,'pct')}</span>
-    `;
-    leg.appendChild(item);
-  });
-}
-
-// ============================================================
-// PANEL 2 — CHANGE MAP
-// ============================================================
-function drawChange() {
-  drawChangeMap('#change-rent-svg', 'd_rent',    'diverging');
-  drawChangeMap('#change-bike-svg', 'd_bike_km', 'sequential');
-}
-
-function drawChangeMap(selector, field, mode) {
-  const svg = d3.select(selector);
-  svg.selectAll('*').remove();
-
-  // Use 2022 geometry features (one per tract), join delta
-  const deltaMap = new Map(deltaData.map(d => [d.geoid, d]));
-  const features = geoData.features
-    .filter(f => f.properties.year === 2022)
-    .map(f => ({ ...f, delta: deltaMap.get(f.properties.geoid) }))
-    .filter(f => f.delta);
-
-  const container = svg.node().parentElement;
-  const W = container.clientWidth - 48;
-  const H = Math.round(W * 1.1);
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-
-  const projection = d3.geoMercator().fitSize([W, H], { type: 'FeatureCollection', features });
-  const path = d3.geoPath().projection(projection);
-
-  const vals = features.map(f => +f.delta[field]).filter(v => !isNaN(v));
-  const ext  = d3.extent(vals);
-
-  let colorScale;
-  if (mode === 'diverging') {
-    const absMax = Math.max(Math.abs(ext[0]), Math.abs(ext[1]));
-    colorScale = d3.scaleDiverging(d3.interpolateRdBu).domain([-absMax, 0, absMax]);
-    colorScale = d3.scaleDiverging(t => d3.interpolateRdBu(1 - t)).domain([-absMax, 0, absMax]);
+function showLayer(id) {
+  layers.forEach(l => l.classList.toggle('active', l.id === id));
+  // trigger feat bar animation when features layer shown
+  if (id === 'layer-features') {
+    setTimeout(() => featRows.forEach(r => r.classList.add('active')), 200);
   } else {
-    colorScale = d3.scaleSequential(d3.interpolateGreens).domain([0, ext[1]]);
+    featRows.forEach(r => r.classList.remove('active'));
   }
-
-  svg.selectAll('path')
-    .data(features)
-    .join('path')
-    .attr('d', path)
-    .attr('fill', d => {
-      const v = +d.delta[field];
-      return isNaN(v) ? '#e4e2dc' : colorScale(v);
-    })
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 0.3)
-    .on('mousemove', function(event, d) {
-      showTip(`
-        <div class="tt-title">${d.properties.geoid}</div>
-        <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.delta.d_rent,'dollar')}</span></div>
-        <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.delta.d_bike_km,'km')}</span></div>
-        <div class="tt-row"><span>Base rent</span><span class="tt-val">${fmt(d.delta.base_rent,'dollar')}</span></div>
-      `, event);
-    })
-    .on('mouseleave', hideTip);
 }
 
-// ============================================================
-// PANEL 3 — RENT TRENDS
-// ============================================================
-function setTrendGroup(g, btn) {
-  trendGroup = g;
-  document.querySelectorAll('#trends .btn-group button')
-    .forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  drawTrends();
-}
-
-function drawTrends() {
-  const svg = d3.select('#trend-svg');
-  svg.selectAll('*').remove();
-
-  const W = svg.node().parentElement.clientWidth - 48;
-  const H = 360;
-  const margin = { top: 20, right: 120, bottom: 40, left: 70 };
-  const iW = W - margin.left - margin.right;
-  const iH = H - margin.top - margin.bottom;
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-
-  const years = [2012, 2016, 2022];
-
-  // Group tracts
-  let groups;
-  if (trendGroup === 'bike') {
-    // Use 2016 bike data as "has lanes" indicator (mid-period)
-    const bikeByGeoid = new Map();
-    panelData.filter(d => d.year === 2016).forEach(d => bikeByGeoid.set(d.geoid, d.bike_length_km));
-    groups = [
-      { key: 'Has bike lanes',    filter: d => (bikeByGeoid.get(d.geoid) || 0) > 0, color: '#2d6a4f' },
-      { key: 'No bike lanes',     filter: d => (bikeByGeoid.get(d.geoid) || 0) === 0, color: '#aaa89f' }
-    ];
-  } else {
-    // Income quartiles based on 2012
-    const inc2012 = panelData.filter(d => d.year === 2012).map(d => d.median_income).sort(d3.ascending);
-    const q = [0, 0.25, 0.5, 0.75, 1].map(p => d3.quantile(inc2012, p));
-    const incByGeoid = new Map();
-    panelData.filter(d => d.year === 2012).forEach(d => incByGeoid.set(d.geoid, d.median_income));
-    groups = [
-      { key: 'Q4 (highest income)', filter: d => (incByGeoid.get(d.geoid)||0) >= q[3], color: '#1a3a4a' },
-      { key: 'Q3',                  filter: d => { const v = incByGeoid.get(d.geoid)||0; return v >= q[2] && v < q[3]; }, color: '#4a7fa5' },
-      { key: 'Q2',                  filter: d => { const v = incByGeoid.get(d.geoid)||0; return v >= q[1] && v < q[2]; }, color: '#95c0d6' },
-      { key: 'Q1 (lowest income)',  filter: d => (incByGeoid.get(d.geoid)||0) < q[1],  color: '#d4eaf5' }
-    ];
-  }
-
-  // Compute median rent per group per year
-  const series = groups.map(grp => {
-    const geoids = new Set(panelData.filter(grp.filter).map(d => d.geoid));
-    const vals = years.map(yr => {
-      const rents = panelData
-        .filter(d => d.year === yr && geoids.has(d.geoid) && d.median_rent != null)
-        .map(d => d.median_rent);
-      return { year: yr, rent: d3.median(rents), n: rents.length };
-    });
-    return { ...grp, vals };
-  });
-
-  // Stats
-  const statsEl = document.getElementById('trend-stats');
-  statsEl.innerHTML = '';
-  series.forEach(s => {
-    const first = s.vals[0]?.rent, last = s.vals[s.vals.length-1]?.rent;
-    const change = last && first ? Math.round(last - first) : null;
-    const el = document.createElement('div');
-    el.className = 'stat';
-    el.innerHTML = `
-      <div class="stat-val" style="color:${s.color}">${change != null ? (change > 0 ? '+' : '') + '$' + change.toLocaleString() : '—'}</div>
-      <div class="stat-label">${s.key} — rent change</div>
-    `;
-    statsEl.appendChild(el);
-  });
-
-  const allRents = series.flatMap(s => s.vals.map(v => v.rent)).filter(Boolean);
-  const x = d3.scalePoint().domain(years).range([0, iW]).padding(0.3);
-  const y = d3.scaleLinear().domain([d3.min(allRents) * 0.92, d3.max(allRents) * 1.05]).range([iH, 0]);
-
-  // Grid
-  g.append('g').selectAll('line').data(y.ticks(5)).join('line')
-    .attr('x1', 0).attr('x2', iW)
-    .attr('y1', d => y(d)).attr('y2', d => y(d))
-    .attr('stroke', '#e4e2dc').attr('stroke-width', 1);
-
-  // Axes
-  g.append('g').attr('transform', `translate(0,${iH})`).call(d3.axisBottom(x).tickFormat(d => d))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size', '12px').style('fill', '#6b6860'); });
-
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d => '$' + d3.format(',')(d)))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size', '11px').style('fill', '#6b6860'); });
-
-  const line = d3.line().x(d => x(d.year)).y(d => y(d.rent)).defined(d => d.rent != null);
-
-  series.forEach(s => {
-    g.append('path').datum(s.vals).attr('fill', 'none')
-      .attr('stroke', s.color).attr('stroke-width', 2.5)
-      .attr('d', line);
-
-    g.selectAll(null).data(s.vals.filter(d => d.rent)).join('circle')
-      .attr('cx', d => x(d.year)).attr('cy', d => y(d.rent))
-      .attr('r', 4).attr('fill', s.color).attr('stroke', '#fff').attr('stroke-width', 1.5)
-      .on('mousemove', (event, d) => showTip(`
-        <div class="tt-title">${s.key} — ${d.year}</div>
-        <div class="tt-row"><span>Median rent</span><span class="tt-val">${fmt(d.rent,'dollar')}</span></div>
-        <div class="tt-row"><span>Tracts</span><span class="tt-val">${d.n}</span></div>
-      `, event))
-      .on('mouseleave', hideTip);
-
-    // Label at end
-    const last = s.vals.filter(d => d.rent).at(-1);
-    if (last) {
-      g.append('text')
-        .attr('x', x(last.year) + 8).attr('y', y(last.rent) + 4)
-        .style('font-size', '11px').style('fill', s.color).style('font-weight', '500')
-        .text(s.key.split('(')[0].trim());
+// IntersectionObserver — fire when step is ~30% into viewport
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      showLayer(entry.target.dataset.layer);
     }
   });
+}, { threshold: 0.3, rootMargin: '0px 0px -20% 0px' });
 
-  // Y axis label
-  g.append('text').attr('transform', 'rotate(-90)')
-    .attr('x', -iH / 2).attr('y', -52)
-    .attr('text-anchor', 'middle')
-    .style('font-size', '11px').style('fill', '#6b6860')
-    .text('Median rent ($)');
-}
+steps.forEach(s => observer.observe(s));
 
-// ============================================================
-// PANEL 4 — SCATTER
-// ============================================================
-function drawScatter() {
-  const svg = d3.select('#scatter-svg');
-  svg.selectAll('*').remove();
+// Start on hero
+showLayer('layer-hero');
 
-  const W = svg.node().parentElement.clientWidth - 48;
-  const H = 420;
-  const margin = { top: 20, right: 30, bottom: 50, left: 70 };
-  const iW = W - margin.left - margin.right;
-  const iH = H - margin.top - margin.bottom;
-  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-
-  const data = deltaData.filter(d => d.d_rent != null && d.d_bike_km != null);
-
-  // Stats
-  const statsEl = document.getElementById('scatter-stats');
-  statsEl.innerHTML = '';
-  const gainedLanes = data.filter(d => d.d_bike_km > 0);
-  const noLanes     = data.filter(d => d.d_bike_km === 0);
-  [
-    { val: data.length,                    label: 'Total tracts' },
-    { val: gainedLanes.length,             label: 'Gained bike lanes' },
-    { val: fmt(d3.median(data.map(d=>d.d_rent)), 'dollar'), label: 'Median &#916; rent' },
-    { val: fmt(d3.median(gainedLanes.map(d=>d.d_rent)), 'dollar'), label: 'Median &#916; rent (gained lanes)' },
-  ].forEach(s => {
-    const el = document.createElement('div');
-    el.className = 'stat';
-    el.innerHTML = `<div class="stat-val">${s.val}</div><div class="stat-label">${s.label}</div>`;
-    statsEl.appendChild(el);
-  });
-
-  const x = d3.scaleLinear().domain([-0.2, d3.max(data, d => d.d_bike_km) * 1.05]).range([0, iW]);
-  const y = d3.scaleLinear().domain(d3.extent(data, d => d.d_rent)).nice().range([iH, 0]);
-  const color = d3.scaleSequential(d3.interpolateBlues)
-    .domain(d3.extent(data, d => d.base_rent));
-
-  // Grid
-  g.append('g').selectAll('line').data(y.ticks(6)).join('line')
-    .attr('x1', 0).attr('x2', iW)
-    .attr('y1', d => y(d)).attr('y2', d => y(d))
-    .attr('stroke', '#e4e2dc').attr('stroke-width', 1);
-
-  // Zero line
-  g.append('line')
-    .attr('x1', 0).attr('x2', iW)
-    .attr('y1', y(0)).attr('y2', y(0))
-    .attr('stroke', '#aaa89f').attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
-
-  // Axes
-  g.append('g').attr('transform', `translate(0,${iH})`).call(d3.axisBottom(x).ticks(6).tickFormat(d => d + ' km'))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size','11px').style('fill','#6b6860'); });
-  g.append('g').call(d3.axisLeft(y).ticks(6).tickFormat(d => '$' + d3.format(',')(d)))
-    .call(ax => { ax.select('.domain').remove(); ax.selectAll('line').remove(); ax.selectAll('text').style('font-size','11px').style('fill','#6b6860'); });
-
-  // OLS regression line
-  const n = data.length;
-  const xm = d3.mean(data, d => d.d_bike_km), ym = d3.mean(data, d => d.d_rent);
-  const slope = d3.sum(data, d => (d.d_bike_km - xm) * (d.d_rent - ym)) /
-                d3.sum(data, d => (d.d_bike_km - xm) ** 2);
-  const intercept = ym - slope * xm;
-  const x1r = x.domain()[0], x2r = x.domain()[1];
-  g.append('line')
-    .attr('x1', x(x1r)).attr('y1', y(intercept + slope * x1r))
-    .attr('x2', x(x2r)).attr('y2', y(intercept + slope * x2r))
-    .attr('stroke', '#c0392b').attr('stroke-width', 1.5)
-    .attr('stroke-dasharray', '5 3').attr('opacity', 0.7);
-
-  // Dots
-  g.selectAll('circle').data(data).join('circle')
-    .attr('cx', d => x(d.d_bike_km))
-    .attr('cy', d => y(d.d_rent))
-    .attr('r', 4)
-    .attr('fill', d => color(d.base_rent))
-    .attr('stroke', '#fff').attr('stroke-width', 0.8)
-    .attr('opacity', 0.75)
-    .on('mousemove', (event, d) => showTip(`
-      <div class="tt-title">${d.geoid}</div>
-      <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.d_rent,'dollar')}</span></div>
-      <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.d_bike_km,'km')}</span></div>
-      <div class="tt-row"><span>Base rent (2012)</span><span class="tt-val">${fmt(d.base_rent,'dollar')}</span></div>
-      <div class="tt-row"><span>&#916; Income</span><span class="tt-val">${fmt(d.d_income,'dollar')}</span></div>
-    `, event))
-    .on('mousemove', function(event, d) {
-      d3.select(this).attr('opacity', 1).attr('r', 5.5);
-      showTip(`
-        <div class="tt-title">${d.geoid}</div>
-        <div class="tt-row"><span>&#916; Rent</span><span class="tt-val">${fmt(d.d_rent,'dollar')}</span></div>
-        <div class="tt-row"><span>&#916; Bike km</span><span class="tt-val">${fmt(d.d_bike_km,'km')}</span></div>
-        <div class="tt-row"><span>Base rent (2012)</span><span class="tt-val">${fmt(d.base_rent,'dollar')}</span></div>
-      `, event);
-      moveTip(event);
-    })
-    .on('mouseleave', function() {
-      d3.select(this).attr('opacity', 0.75).attr('r', 4);
-      hideTip();
-    });
-
-  // Axis labels
-  g.append('text').attr('x', iW/2).attr('y', iH + 42)
-    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860')
-    .text('Δ Bike lane km (2012 → 2022)');
-  g.append('text').attr('transform','rotate(-90)').attr('x', -iH/2).attr('y', -55)
-    .attr('text-anchor','middle').style('font-size','12px').style('fill','#6b6860')
-    .text('Δ Median rent ($)');
-
-  // Slope annotation
-  g.append('text').attr('x', iW - 4).attr('y', 14)
-    .attr('text-anchor','end').style('font-size','11px').style('fill','#c0392b')
-    .text(`slope: $${slope.toFixed(1)} per km`);
-}
-
-// ============================================================
-// RESIZE
-// ============================================================
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    const active = document.querySelector('.panel.active')?.id;
-    if (active === 'geo')     drawGeo();
-    if (active === 'change')  drawChange();
-    if (active === 'trends')  drawTrends();
-    if (active === 'scatter') drawScatter();
-  }, 200);
-});
-
-// ============================================================
-// INIT
-// ============================================================
-loadData().catch(err => {
-  document.getElementById('loading').innerHTML =
-    `<p style="color:#c0392b;max-width:400px;text-align:center">
-      Could not load data files. Make sure <code>data/cook_tracts_panel.geojson</code>,
-      <code>data/delta.csv</code>, and <code>data/panel_flat.csv</code> exist
-      and you are serving from a local server (not file://).
-    </p>`;
-  console.error(err);
-});
-</script>
-</body>
-</html>
+// Scroll progress bar
+windo
