@@ -19,11 +19,11 @@
     --card-bg: rgba(255,255,255,0.97);
     --shadow:  0 4px 32px rgba(0,0,0,0.13);
   }
-
+ 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   html { scroll-behavior: smooth; }
-
+ 
   body {
     font-family: 'DM Sans', sans-serif;
     font-weight: 300;
@@ -31,7 +31,7 @@
     background: #41B6E6;
     overflow-x: hidden;
   }
-
+ 
   /* ── NAV ─────────────────────────────────────────── */
   nav {
     position: fixed;
@@ -67,12 +67,12 @@
     transition: color 0.2s;
   }
   .nav-links a:hover { color: var(--white); }
-
+ 
   /* ── SCROLLY LAYOUT ──────────────────────────────── */
   .scrolly-container {
     position: relative;
   }
-
+ 
   /* sticky map pane */
   .map-pane {
     position: sticky;
@@ -83,7 +83,7 @@
     background: #41B6E6;
     z-index: 1;
   }
-
+ 
   /* each viz layer */
   .viz-layer {
     position: absolute;
@@ -107,7 +107,7 @@
     justify-content: center;
     background: #41B6E6;
   }
-
+ 
   /* hero layer */
   .hero-layer {
     background: #41B6E6;
@@ -169,7 +169,7 @@
     0%, 100% { transform: scaleY(1); opacity: 0.4; }
     50%       { transform: scaleY(1.3); opacity: 0.9; }
   }
-
+ 
   /* ── STORY STEPS (scrollable overlay) ───────────── */
   .story-steps {
     position: relative;
@@ -178,7 +178,7 @@
     /* first step starts after hero (100vh) */
     margin-top: calc(-100vh + 56px);
   }
-
+ 
   .step {
     min-height: 100vh;
     display: flex;
@@ -190,7 +190,7 @@
     padding: 60px calc(60% + 20px) 60px 60px; /* alternate left */
     justify-content: flex-start;
   }
-
+ 
   .step-card {
     pointer-events: all;
     background: var(--card-bg);
@@ -203,7 +203,7 @@
     position: relative;
   }
   .step-card.accent-red { border-top-color: var(--red); }
-
+ 
   .step-number {
     font-size: 11px;
     font-weight: 500;
@@ -213,7 +213,7 @@
     margin-bottom: 12px;
   }
   .step-card.accent-red .step-number { color: var(--red); }
-
+ 
   .step-card h2 {
     font-family: 'Playfair Display', serif;
     font-size: 22px;
@@ -228,7 +228,7 @@
     color: #444;
   }
   .step-card p + p { margin-top: 10px; }
-
+ 
   .stat-row {
     display: flex;
     gap: 20px;
@@ -256,7 +256,7 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
-
+ 
   .tag-list {
     display: flex;
     flex-wrap: wrap;
@@ -274,7 +274,7 @@
     text-transform: uppercase;
   }
   .tag.red { background: #fde8ec; color: var(--red); }
-
+ 
   .divider {
     width: 32px;
     height: 2px;
@@ -282,7 +282,7 @@
     margin: 16px 0;
   }
   .step-card.accent-red .divider { background: var(--red); }
-
+ 
   /* feature importance bars */
   .feat-bar-list { margin-top: 16px; }
   .feat-row {
@@ -321,7 +321,7 @@
     text-align: right;
   }
   .feat-row.active .feat-bar { transform: scaleX(1); }
-
+ 
   /* final CTA */
   .final-step {
     min-height: 100vh;
@@ -387,7 +387,7 @@
     color: var(--white);
   }
   .btn-red:hover { background: #c20025; }
-
+ 
   .next-steps {
     margin-top: 32px;
     padding-top: 28px;
@@ -421,7 +421,7 @@
     color: var(--blue);
     font-size: 12px;
   }
-
+ 
   /* chart canvases */
   .chart-wrap {
     width: min(680px, 90vw);
@@ -441,7 +441,7 @@
     margin-bottom: 24px;
   }
   canvas { display: block; width: 100% !important; }
-
+ 
   /* progress bar */
   .progress-bar {
     position: fixed;
@@ -456,7 +456,7 @@
 </style>
 </head>
 <body>
-
+ 
 <!-- NAV -->
 <nav>
   <a class="nav-brand" href="#">Chicago Crash Analysis</a>
@@ -467,15 +467,15 @@
     <li><a href="https://github.com/ckucewicz/traffic_crash_prediction" target="_blank">GitHub</a></li>
   </ul>
 </nav>
-
+ 
 <div class="progress-bar" id="progressBar"></div>
-
+ 
 <!-- ── SCROLLY CONTAINER ──────────────────────────── -->
 <div class="scrolly-container">
-
+ 
   <!-- STICKY MAP PANE -->
   <div class="map-pane" id="mapPane">
-
+ 
     <!-- Layer 0: Hero -->
     <div class="viz-layer hero-layer active" id="layer-hero">
       <div class="hero-flag">
@@ -491,7 +491,7 @@
         <div class="scroll-arrow"></div>
       </div>
     </div>
-
+ 
     <!-- Layer 1: Target distribution chart -->
     <div class="viz-layer chart-layer" id="layer-chart">
       <div class="chart-wrap">
@@ -500,22 +500,22 @@
         <canvas id="targetChart" height="220"></canvas>
       </div>
     </div>
-
+ 
     <!-- Layer 2: Heatmap iframe -->
     <div class="viz-layer" id="layer-heatmap">
-      <iframe src="docs/maps/heatmap.html" title="Crash density heatmap" loading="lazy"></iframe>
+      <iframe src="maps/heatmap.html" title="Crash density heatmap" loading="lazy"></iframe>
     </div>
-
+ 
     <!-- Layer 3: Severity map iframe -->
     <div class="viz-layer" id="layer-severity">
-      <iframe src="docs/maps/severity_map.html" title="Crash severity map" loading="lazy"></iframe>
+      <iframe src="maps/severity_map.html" title="Crash severity map" loading="lazy"></iframe>
     </div>
-
+ 
     <!-- Layer 4: Choropleth iframe -->
     <div class="viz-layer" id="layer-choropleth">
-      <iframe src="docs/maps/choropleth.html" title="Community area choropleth" loading="lazy"></iframe>
+      <iframe src="maps/choropleth.html" title="Community area choropleth" loading="lazy"></iframe>
     </div>
-
+ 
     <!-- Layer 5: Feature importance chart -->
     <div class="viz-layer chart-layer" id="layer-features">
       <div class="chart-wrap">
@@ -555,20 +555,20 @@
         </div>
       </div>
     </div>
-
+ 
   </div><!-- /map-pane -->
-
+ 
   <!-- ── STORY STEPS ──────────────────────────────── -->
   <div class="story-steps">
-
+ 
     <!-- Step 1: The Problem -->
     <div class="step" id="problem" data-layer="layer-chart">
       <div class="step-card">
         <div class="step-number">01 — The Problem</div>
         <h2>A City Working Toward Zero Traffic Deaths</h2>
         <div class="divider"></div>
-        <p>In 2023, Chicago recorded 136 traffic deaths. In response, the city launched its <strong>Vision Zero Action Plan</strong> in 2017, committing to eliminate traffic fatalities and serious injuries by 2026.</p>
-        <p>Traffic safety is also an equity issue — Black and Brown communities on Chicago's South and West Sides bear a disproportionate share of crash hospitalizations.</p>
+        <p>Chicago launched its <strong>Vision Zero Action Plan</strong> in 2017 with a goal of eliminating traffic fatalities and serious injuries by 2026. Despite that commitment, the city still recorded 136 traffic deaths in 2023 alone.</p>
+        <p>Traffic safety is also an equity issue. Black and Brown communities on Chicago's South and West Sides bear a disproportionate share of crash hospitalizations, often in neighborhoods that have seen less investment in road safety infrastructure.</p>
         <div class="stat-row">
           <div class="stat-block">
             <div class="stat-num">900K+</div>
@@ -579,7 +579,7 @@
             <div class="stat-label">Serious injuries</div>
           </div>
         </div>
-        <p>This severe class imbalance makes standard accuracy metrics unreliable. The model uses <strong>Precision-Recall AUC</strong> instead.</p>
+        <p>Serious injuries make up a small fraction of all crashes. That class imbalance makes standard accuracy metrics misleading, so the model optimizes for <strong>Precision-Recall AUC</strong> instead.</p>
         <div class="tag-list">
           <span class="tag">Binary Classification</span>
           <span class="tag red">Class Imbalance</span>
@@ -588,15 +588,44 @@
         </div>
       </div>
     </div>
+ 
+    <!-- Step 2: The Data -->
+    <div class="step" data-layer="layer-chart">
+      <div class="step-card accent-red">
+        <div class="step-number">02 — The Data</div>
+        <h2>Three Datasets, One Picture of a Crash</h2>
+        <div class="divider"></div>
+        <p>The analysis draws from three public datasets maintained by the Chicago Data Portal, all linked by a shared crash record ID.</p>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-num">901K</div>
+            <div class="stat-label">Crash records</div>
+          </div>
+          <div class="stat-block red">
+            <div class="stat-num">1.98M</div>
+            <div class="stat-label">People records</div>
+          </div>
+        </div>
+        <p><strong>Crashes</strong> — one row per incident, with road conditions, weather, speed limit, contributing cause, and the target variable: most severe injury type.</p>
+        <p><strong>People</strong> — one row per person involved, capturing age, sex, airbag deployment, and injury classification.</p>
+        <p><strong>Vehicles</strong> — one row per vehicle unit, with vehicle type and driver maneuver at the time of the crash.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:12px;">The three datasets were aggregated to crash level and merged before modeling. The final cleaned sample covers roughly 96K records across 15 features.</p>
+        <div class="tag-list">
+          <span class="tag red">Chicago Data Portal</span>
+          <span class="tag">2021 to 2024</span>
+          <span class="tag">15 Features</span>
+        </div>
+      </div>
+    </div>
 
-    <!-- Step 2: Crash density -->
+    <!-- Step 3: Crash density -->
     <div class="step" id="spatial" data-layer="layer-heatmap">
       <div class="step-card accent-red">
-        <div class="step-number">02 — Spatial Analysis</div>
+        <div class="step-number">03 — Spatial Analysis</div>
         <h2>Where Do Crashes Concentrate?</h2>
         <div class="divider"></div>
-        <p>Crash density clusters heavily along Chicago's major north-south arterials — <strong>Western, Pulaski, and Cicero Avenues</strong> — and throughout the downtown Loop corridor.</p>
-        <p>These hotspots align with high traffic volume, but volume alone doesn't explain injury severity. The next maps dig deeper.</p>
+        <p>Crash volume clusters along Chicago's major north-south corridors: <strong>Western, Pulaski, and Cicero Avenues</strong>, plus the downtown Loop. These patterns track closely with traffic volume on high-speed arterials.</p>
+        <p>But high crash volume and high injury severity are not the same thing. The next two maps break that apart.</p>
         <div class="stat-row">
           <div class="stat-block">
             <div class="stat-num">894K</div>
@@ -607,18 +636,18 @@
             <div class="stat-label">Community areas</div>
           </div>
         </div>
-        <p style="font-size:12px; color:var(--muted); margin-top:8px;">↑ Interact with the map directly — zoom, pan, explore.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:8px;">Zoom and pan the map to explore crash density across the city.</p>
       </div>
     </div>
-
+ 
     <!-- Step 3: Severity map -->
     <div class="step" data-layer="layer-severity">
       <div class="step-card">
-        <div class="step-number">03 — Severity Patterns</div>
+        <div class="step-number">04 — Severity Patterns</div>
         <h2>Serious Crashes Are Spread Differently Than Volume</h2>
         <div class="divider"></div>
-        <p><span style="color:var(--red); font-weight:500;">Red points</span> mark fatal or incapacitating crashes. <span style="color:#4393c3; font-weight:500;">Blue points</span> are non-serious. Toggle the layers using the map controls.</p>
-        <p>Serious crashes are not simply a function of where crashes are most frequent. They spread into residential areas and corridors with fewer overall incidents, suggesting road design and speed environment play a larger role than raw volume.</p>
+        <p><span style="color:var(--red); font-weight:500;">Red points</span> are fatal or incapacitating crashes. <span style="color:#4393c3; font-weight:500;">Blue points</span> are non-serious. Use the layer toggle in the top right to show or hide each group.</p>
+        <p>Serious crashes do not simply follow total crash volume. They show up in residential corridors and lower-traffic areas too, which points to road design and speed environment as bigger factors than volume alone.</p>
         <div class="stat-row">
           <div class="stat-block red">
             <div class="stat-num">16K+</div>
@@ -631,16 +660,16 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Step 4: Choropleth -->
     <div class="step" data-layer="layer-choropleth">
       <div class="step-card accent-red">
-        <div class="step-number">04 — Neighborhood Equity</div>
+        <div class="step-number">05 — Neighborhood Equity</div>
         <h2>Serious Injury Rates Vary Sharply by Neighborhood</h2>
         <div class="divider"></div>
-        <p>Aggregating to Chicago's 77 community areas reveals a pattern that crash counts alone obscure: <strong>some lower-volume neighborhoods have significantly higher serious injury rates</strong>.</p>
-        <p>Communities on the South and West Sides — which face documented underinvestment in traffic infrastructure — show elevated rates, reinforcing the equity framing of Chicago's Vision Zero plan.</p>
-        <p>Hover over any neighborhood to see total crashes, serious crashes, and the serious injury rate.</p>
+        <p>Looking at crash counts by neighborhood misses the point. What matters is the <strong>rate</strong> of serious injuries per crash. Some lower-volume neighborhoods have rates well above the city average.</p>
+        <p>Communities on the South and West Sides show consistently elevated rates. These are also neighborhoods that have historically seen less investment in traffic safety infrastructure, which is central to Chicago's Vision Zero equity framing.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:8px;">Hover over any neighborhood to see total crashes, serious crashes, and the serious injury rate.</p>
         <div class="tag-list">
           <span class="tag red">Equity</span>
           <span class="tag">GeoPandas</span>
@@ -649,16 +678,16 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Step 5: Feature importances -->
     <div class="step" id="model" data-layer="layer-features">
       <div class="step-card">
-        <div class="step-number">05 — Model Insights</div>
+        <div class="step-number">06 — Model Insights</div>
         <h2>What Predicts a Serious Crash?</h2>
         <div class="divider"></div>
-        <p>A decision tree model (PR AUC = 0.096) was selected for its interpretability — essential for policy audiences who need to understand and trust model outputs.</p>
-        <p><strong>Airbag non-deployment</strong> is the top predictor, likely acting as a proxy for vehicle speed and size at impact. <strong>Male sex</strong> and <strong>seasonal extremes</strong> also contribute meaningfully.</p>
-        <p style="font-size:12px; color:var(--muted); margin-top:10px;">Note: feature importances reflect entropy reduction, not effect direction or magnitude.</p>
+        <p>A decision tree was chosen over black-box alternatives because interpretability matters for policy work. Decision-makers need to understand why a model flags something, not just that it does.</p>
+        <p>The top predictor is <strong>airbag non-deployment</strong>, which likely serves as a proxy for crash force: airbags only deploy above a certain impact threshold, so their absence in serious crashes points to vehicle speed and size as underlying factors. <strong>Male drivers</strong> and <strong>seasonal conditions</strong> also rank consistently high.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:10px;">Feature importance scores reflect how much each variable reduces uncertainty in the model, not the direction or size of its effect.</p>
         <div class="tag-list">
           <span class="tag">Decision Tree</span>
           <span class="tag">Entropy / Info Gain</span>
@@ -666,15 +695,15 @@
         </div>
       </div>
     </div>
-
+ 
   </div><!-- /story-steps -->
 </div><!-- /scrolly-container -->
-
+ 
 <!-- FINAL CTA -->
 <div class="final-step">
   <div class="final-card">
     <h2>Policy Recommendations</h2>
-    <p>The model and spatial analysis together support three actionable directions for CDOT, CMAP, and Cook County transportation agencies.</p>
+    <p>The model and the spatial analysis point in the same direction. The question is not just where crashes happen, but which crashes cause serious harm and why. Here is what the data suggests agencies like CDOT and CMAP should focus on.</p>
     <div class="btn-row">
       <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/notebook.ipynb" target="_blank" class="btn btn-primary">Full Notebook</a>
       <a href="https://github.com/ckucewicz/traffic_crash_prediction/blob/main/spatial_analysis.ipynb" target="_blank" class="btn btn-secondary">Spatial Notebook</a>
@@ -683,11 +712,11 @@
     <div class="next-steps">
       <h3>Recommendations</h3>
       <ul>
-        <li>Require annual airbag inspections — particularly for vehicles registered in high-rate community areas</li>
-        <li>Introduce tiered weight fees for heavy personal vehicles (trucks, SUVs) to reduce impact forces in urban crashes</li>
-        <li>Target male driver safety campaigns toward aggressive/reckless driving behaviors flagged by the model</li>
-        <li>Prioritize Vision Zero infrastructure investment in neighborhoods with high serious-injury rates, not just high crash counts</li>
-        <li>Integrate spatial features (proximity to signals, speed cameras) directly into future model iterations</li>
+        <li>Require annual airbag inspections, with priority given to older vehicles in neighborhoods that show high serious injury rates</li>
+        <li>Consider tiered registration fees for heavier personal vehicles like trucks and SUVs, which generate more force on impact in city driving conditions</li>
+        <li>Design targeted safety campaigns for male drivers, focusing on the aggressive and reckless driving behaviors that the model flags as top contributors</li>
+        <li>Direct Vision Zero infrastructure spending using serious injury rate by neighborhood, not just total crash volume</li>
+        <li>In future modeling work, incorporate spatial features like proximity to traffic signals and speed cameras directly into the feature set</li>
       </ul>
     </div>
     <p style="margin-top:28px; font-size:13px; color:#999;">
@@ -697,7 +726,7 @@
     </p>
   </div>
 </div>
-
+ 
 <!-- Chart.js -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
@@ -742,13 +771,13 @@ new Chart(ctx, {
     }
   }
 });
-
+ 
 // ── Scrollytelling engine ────────────────────────────
 const layers   = document.querySelectorAll('.viz-layer');
 const steps    = document.querySelectorAll('[data-layer]');
 const progress = document.getElementById('progressBar');
 const featRows = document.querySelectorAll('.feat-row');
-
+ 
 function showLayer(id) {
   layers.forEach(l => l.classList.toggle('active', l.id === id));
   // trigger feat bar animation when features layer shown
@@ -758,7 +787,7 @@ function showLayer(id) {
     featRows.forEach(r => r.classList.remove('active'));
   }
 }
-
+ 
 // IntersectionObserver — fire when step is ~30% into viewport
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -767,11 +796,18 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.3, rootMargin: '0px 0px -20% 0px' });
-
+ 
 steps.forEach(s => observer.observe(s));
-
+ 
 // Start on hero
 showLayer('layer-hero');
-
+ 
 // Scroll progress bar
-windo
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (scrollTop / docHeight * 100) + '%';
+});
+</script>
+</body>
+</html>
