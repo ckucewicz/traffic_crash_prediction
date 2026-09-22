@@ -104,8 +104,14 @@
   .viz-layer.chart-layer {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
+    padding-right: calc(40% + 40px);
     background: #41B6E6;
+  }
+  .viz-layer.chart-layer.chart-right {
+    justify-content: flex-start;
+    padding-right: 0;
+    padding-left: calc(40% + 40px);
   }
  
   /* hero layer */
@@ -485,7 +491,7 @@
         <div class="flag-star"></div>
       </div>
       <h1>Predicting Serious Injuries in <em>Chicago</em> Traffic Crashes</h1>
-      <p>A machine learning case study using 900K+ crash records from Chicago's Open Data Portal — combining interpretable modeling, spatial analysis, and policy-relevant insights.</p>
+      <p>A machine learning case study using 900K+ crash records from Chicago's Open Data Portal, sampled to 96K for modeling, combining interpretable machine learning, spatial analysis, and policy-relevant insights.</p>
       <div class="hero-scroll-hint">
         <span>Scroll to explore</span>
         <div class="scroll-arrow"></div>
@@ -493,7 +499,7 @@
     </div>
  
     <!-- Layer 1: Target distribution chart -->
-    <div class="viz-layer chart-layer" id="layer-chart">
+    <div class="viz-layer chart-layer chart-right" id="layer-chart">
       <div class="chart-wrap">
         <h3>Target Class Distribution</h3>
         <p class="chart-sub">Serious injuries (fatal or incapacitating) account for less than 2% of all crashes in the cleaned dataset</p>
@@ -571,8 +577,8 @@
         <p>Traffic safety is also an equity issue. Black and Brown communities on Chicago's South and West Sides bear a disproportionate share of crash hospitalizations, often in neighborhoods that have seen less investment in road safety infrastructure.</p>
         <div class="stat-row">
           <div class="stat-block">
-            <div class="stat-num">900K+</div>
-            <div class="stat-label">Crash records</div>
+            <div class="stat-num">96K</div>
+            <div class="stat-label">Modeling sample</div>
           </div>
           <div class="stat-block red">
             <div class="stat-num">~2%</div>
@@ -730,6 +736,17 @@
 <!-- Chart.js -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
+// ── Iframe scroll fix
+let scrollTimer = null;
+const iframes = document.querySelectorAll('.viz-layer iframe');
+window.addEventListener('scroll', () => {
+  iframes.forEach(f => f.style.pointerEvents = 'none');
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    iframes.forEach(f => f.style.pointerEvents = 'auto');
+  }, 300);
+}, { passive: true });
+
 // ── Target distribution chart ────────────────────────
 const ctx = document.getElementById('targetChart').getContext('2d');
 new Chart(ctx, {
