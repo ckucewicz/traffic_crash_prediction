@@ -100,12 +100,47 @@
     width: 100%;
     height: 100%;
     border: none;
+    pointer-events: none;
+  }
+  .viz-layer.map-unlocked iframe {
+    pointer-events: auto;
+  }
+  .map-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 24px;
+  }
+  .map-overlay-hint {
+    background: rgba(0,0,0,0.55);
+    color: white;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 8px 16px;
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.4s;
+  }
+  .viz-layer.map-unlocked .map-overlay {
+    display: none;
   }
   .viz-layer.chart-layer {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
+    padding-right: calc(40% + 40px);
     background: #41B6E6;
+  }
+  .viz-layer.chart-layer.chart-right {
+    justify-content: flex-start;
+    padding-right: 0;
+    padding-left: calc(40% + 40px);
   }
  
   /* hero layer */
@@ -496,7 +531,7 @@
     </div>
  
     <!-- Layer 1: Target distribution chart -->
-    <div class="viz-layer chart-layer" id="layer-chart">
+    <div class="viz-layer chart-layer chart-right" id="layer-chart">
       <div class="chart-wrap">
         <h3>Target Class Distribution</h3>
         <p class="chart-sub">Serious injuries (fatal or incapacitating) account for less than 2% of all crashes in the cleaned dataset</p>
@@ -506,16 +541,19 @@
  
     <!-- Layer 2: Heatmap iframe -->
     <div class="viz-layer" id="layer-heatmap">
+      <div class="map-overlay" onclick="unlockMap(this.parentElement)"><span class="map-overlay-hint">Click to interact with map</span></div>
       <iframe src="maps/heatmap.html" title="Crash density heatmap" loading="lazy"></iframe>
     </div>
  
     <!-- Layer 3: Severity map iframe -->
     <div class="viz-layer" id="layer-severity">
+      <div class="map-overlay" onclick="unlockMap(this.parentElement)"><span class="map-overlay-hint">Click to interact with map</span></div>
       <iframe src="maps/severity_map.html" title="Crash severity map" loading="lazy"></iframe>
     </div>
  
     <!-- Layer 4: Choropleth iframe -->
     <div class="viz-layer" id="layer-choropleth">
+      <div class="map-overlay" onclick="unlockMap(this.parentElement)"><span class="map-overlay-hint">Click to interact with map</span></div>
       <iframe src="maps/choropleth.html" title="Community area choropleth" loading="lazy"></iframe>
     </div>
  
@@ -805,6 +843,17 @@ steps.forEach(s => observer.observe(s));
 // Start on hero
 showLayer('layer-hero');
  
+// Map unlock/lock
+function unlockMap(layer) {
+  document.querySelectorAll('.viz-layer').forEach(l => l.classList.remove('map-unlocked'));
+  layer.classList.add('map-unlocked');
+}
+
+// Re-lock maps when user scrolls
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.viz-layer').forEach(l => l.classList.remove('map-unlocked'));
+}, { passive: true });
+
 // Scroll progress bar
 window.addEventListener('scroll', () => {
   const scrollTop = window.scrollY;
