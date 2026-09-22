@@ -1,10 +1,9 @@
-Index · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chicago Traffic Crash Analysis — Chris Kucewicz</title>
+<title>Chicago Traffic Crash Analysis | Chris Kucewicz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -105,14 +104,8 @@ Index · HTML
   .viz-layer.chart-layer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    padding-right: calc(40% + 40px);
+    justify-content: center;
     background: #41B6E6;
-  }
-  .viz-layer.chart-layer.chart-right {
-    justify-content: flex-start;
-    padding-right: 0;
-    padding-left: calc(40% + 40px);
   }
  
   /* hero layer */
@@ -124,6 +117,7 @@ Index · HTML
     justify-content: center;
     text-align: center;
     padding: 60px 40px;
+    min-height: calc(100vh - 56px);
   }
   .hero-flag {
     display: flex;
@@ -182,8 +176,10 @@ Index · HTML
     position: relative;
     z-index: 2;
     pointer-events: none;
-    /* first step starts after hero (100vh) */
-    margin-top: calc(-100vh + 56px);
+    margin-top: 0;
+  }
+  .story-steps .step {
+    pointer-events: none;
   }
  
   .step {
@@ -492,7 +488,7 @@ Index · HTML
         <div class="flag-star"></div>
       </div>
       <h1>Predicting Serious Injuries in <em>Chicago</em> Traffic Crashes</h1>
-      <p>A machine learning case study using 900K+ crash records from Chicago's Open Data Portal, sampled to 96K for modeling, combining interpretable machine learning, spatial analysis, and policy-relevant insights.</p>
+      <p>A machine learning case study using 900K+ crash records from Chicago's Open Data Portal, combining interpretable modeling, spatial analysis, and policy-relevant insights.</p>
       <div class="hero-scroll-hint">
         <span>Scroll to explore</span>
         <div class="scroll-arrow"></div>
@@ -500,7 +496,7 @@ Index · HTML
     </div>
  
     <!-- Layer 1: Target distribution chart -->
-    <div class="viz-layer chart-layer chart-right" id="layer-chart">
+    <div class="viz-layer chart-layer" id="layer-chart">
       <div class="chart-wrap">
         <h3>Target Class Distribution</h3>
         <p class="chart-sub">Serious injuries (fatal or incapacitating) account for less than 2% of all crashes in the cleaned dataset</p>
@@ -527,35 +523,35 @@ Index · HTML
     <div class="viz-layer chart-layer" id="layer-features">
       <div class="chart-wrap">
         <h3>Top Feature Importances</h3>
-        <p class="chart-sub">Decision tree model — contribution to reducing entropy across splits</p>
+        <p class="chart-sub">Decision tree model: contribution to reducing entropy across splits</p>
         <div class="feat-bar-list" id="featBars">
           <div class="feat-row" data-val="0.0625" data-color="blue">
-            <span class="feat-label">Airbag — Not Deployed</span>
+            <span class="feat-label">Airbag: Not Deployed</span>
             <div class="feat-bar-wrap"><div class="feat-bar" style="width:100%"></div></div>
             <span class="feat-val">0.063</span>
           </div>
           <div class="feat-row" data-val="0.0499" data-color="muted">
-            <span class="feat-label">Crash Cause — Unknown/Other</span>
+            <span class="feat-label">Crash Cause: Unknown/Other</span>
             <div class="feat-bar-wrap"><div class="feat-bar" style="width:79.8%"></div></div>
             <span class="feat-val">0.050</span>
           </div>
           <div class="feat-row" data-val="0.0437" data-color="red">
-            <span class="feat-label">Sex — Male</span>
+            <span class="feat-label">Sex: Male</span>
             <div class="feat-bar-wrap"><div class="feat-bar red" style="width:69.9%"></div></div>
             <span class="feat-val">0.044</span>
           </div>
           <div class="feat-row" data-val="0.0414" data-color="blue">
-            <span class="feat-label">Season — Summer</span>
+            <span class="feat-label">Season: Summer</span>
             <div class="feat-bar-wrap"><div class="feat-bar" style="width:66.2%"></div></div>
             <span class="feat-val">0.041</span>
           </div>
           <div class="feat-row" data-val="0.0397" data-color="blue">
-            <span class="feat-label">Season — Winter</span>
+            <span class="feat-label">Season: Winter</span>
             <div class="feat-bar-wrap"><div class="feat-bar" style="width:63.5%"></div></div>
             <span class="feat-val">0.040</span>
           </div>
           <div class="feat-row" data-val="0.0391" data-color="blue">
-            <span class="feat-label">Season — Spring</span>
+            <span class="feat-label">Season: Spring</span>
             <div class="feat-bar-wrap"><div class="feat-bar" style="width:62.6%"></div></div>
             <span class="feat-val">0.039</span>
           </div>
@@ -571,15 +567,15 @@ Index · HTML
     <!-- Step 1: The Problem -->
     <div class="step" id="problem" data-layer="layer-chart">
       <div class="step-card">
-        <div class="step-number">01 — The Problem</div>
+        <div class="step-number">01 / The Problem</div>
         <h2>A City Working Toward Zero Traffic Deaths</h2>
         <div class="divider"></div>
         <p>Chicago launched its <strong>Vision Zero Action Plan</strong> in 2017 with a goal of eliminating traffic fatalities and serious injuries by 2026. Despite that commitment, the city still recorded 136 traffic deaths in 2023 alone.</p>
         <p>Traffic safety is also an equity issue. Black and Brown communities on Chicago's South and West Sides bear a disproportionate share of crash hospitalizations, often in neighborhoods that have seen less investment in road safety infrastructure.</p>
         <div class="stat-row">
           <div class="stat-block">
-            <div class="stat-num">96K</div>
-            <div class="stat-label">Modeling sample</div>
+            <div class="stat-num">900K+</div>
+            <div class="stat-label">Crash records</div>
           </div>
           <div class="stat-block red">
             <div class="stat-num">~2%</div>
@@ -599,7 +595,7 @@ Index · HTML
     <!-- Step 2: The Data -->
     <div class="step" data-layer="layer-chart">
       <div class="step-card accent-red">
-        <div class="step-number">02 — The Data</div>
+        <div class="step-number">02 / The Data</div>
         <h2>Three Datasets, One Picture of a Crash</h2>
         <div class="divider"></div>
         <p>The analysis draws from three public datasets maintained by the Chicago Data Portal, all linked by a shared crash record ID.</p>
@@ -613,9 +609,9 @@ Index · HTML
             <div class="stat-label">People records</div>
           </div>
         </div>
-        <p><strong>Crashes</strong> — one row per incident, with road conditions, weather, speed limit, contributing cause, and the target variable: most severe injury type.</p>
-        <p><strong>People</strong> — one row per person involved, capturing age, sex, airbag deployment, and injury classification.</p>
-        <p><strong>Vehicles</strong> — one row per vehicle unit, with vehicle type and driver maneuver at the time of the crash.</p>
+        <p><strong>Crashes</strong>: one row per incident, with road conditions, weather, speed limit, contributing cause, and the target variable: most severe injury type.</p>
+        <p><strong>People</strong>: one row per person involved, capturing age, sex, airbag deployment, and injury classification.</p>
+        <p><strong>Vehicles</strong>: one row per vehicle unit, with vehicle type and driver maneuver at the time of the crash.</p>
         <p style="font-size:12px; color:var(--muted); margin-top:12px;">The three datasets were aggregated to crash level and merged before modeling. The final cleaned sample covers roughly 96K records across 15 features.</p>
         <div class="tag-list">
           <span class="tag red">Chicago Data Portal</span>
@@ -624,11 +620,11 @@ Index · HTML
         </div>
       </div>
     </div>
- 
+
     <!-- Step 3: Crash density -->
     <div class="step" id="spatial" data-layer="layer-heatmap">
       <div class="step-card accent-red">
-        <div class="step-number">03 — Spatial Analysis</div>
+        <div class="step-number">03 / Spatial Analysis</div>
         <h2>Where Do Crashes Concentrate?</h2>
         <div class="divider"></div>
         <p>Crash volume clusters along Chicago's major north-south corridors: <strong>Western, Pulaski, and Cicero Avenues</strong>, plus the downtown Loop. These patterns track closely with traffic volume on high-speed arterials.</p>
@@ -650,7 +646,7 @@ Index · HTML
     <!-- Step 3: Severity map -->
     <div class="step" data-layer="layer-severity">
       <div class="step-card">
-        <div class="step-number">04 — Severity Patterns</div>
+        <div class="step-number">04 / Severity Patterns</div>
         <h2>Serious Crashes Are Spread Differently Than Volume</h2>
         <div class="divider"></div>
         <p><span style="color:var(--red); font-weight:500;">Red points</span> are fatal or incapacitating crashes. <span style="color:#4393c3; font-weight:500;">Blue points</span> are non-serious. Use the layer toggle in the top right to show or hide each group.</p>
@@ -671,7 +667,7 @@ Index · HTML
     <!-- Step 4: Choropleth -->
     <div class="step" data-layer="layer-choropleth">
       <div class="step-card accent-red">
-        <div class="step-number">05 — Neighborhood Equity</div>
+        <div class="step-number">05 / Neighborhood Equity</div>
         <h2>Serious Injury Rates Vary Sharply by Neighborhood</h2>
         <div class="divider"></div>
         <p>Looking at crash counts by neighborhood misses the point. What matters is the <strong>rate</strong> of serious injuries per crash. Some lower-volume neighborhoods have rates well above the city average.</p>
@@ -689,7 +685,7 @@ Index · HTML
     <!-- Step 5: Feature importances -->
     <div class="step" id="model" data-layer="layer-features">
       <div class="step-card">
-        <div class="step-number">06 — Model Insights</div>
+        <div class="step-number">06 / Model Insights</div>
         <h2>What Predicts a Serious Crash?</h2>
         <div class="divider"></div>
         <p>A decision tree was chosen over black-box alternatives because interpretability matters for policy work. Decision-makers need to understand why a model flags something, not just that it does.</p>
@@ -737,17 +733,6 @@ Index · HTML
 <!-- Chart.js -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// ── Iframe scroll fix
-let scrollTimer = null;
-const iframes = document.querySelectorAll('.viz-layer iframe');
-window.addEventListener('scroll', () => {
-  iframes.forEach(f => f.style.pointerEvents = 'none');
-  clearTimeout(scrollTimer);
-  scrollTimer = setTimeout(() => {
-    iframes.forEach(f => f.style.pointerEvents = 'auto');
-  }, 300);
-}, { passive: true });
-
 // ── Target distribution chart ────────────────────────
 const ctx = document.getElementById('targetChart').getContext('2d');
 new Chart(ctx, {
@@ -806,7 +791,7 @@ function showLayer(id) {
   }
 }
  
-// IntersectionObserver — fire when step is ~30% into viewport
+// IntersectionObserver: fire when step is ~30% into viewport
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -829,21 +814,3 @@ window.addEventListener('scroll', () => {
 </script>
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
