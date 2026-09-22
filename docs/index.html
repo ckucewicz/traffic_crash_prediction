@@ -463,6 +463,8 @@
   /* chart canvases */
   .chart-wrap {
     width: min(680px, 90vw);
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
     background: var(--white);
     border-radius: 4px;
     padding: 36px 40px;
@@ -728,7 +730,7 @@
         <div class="divider"></div>
         <p>A decision tree was chosen over black-box alternatives because interpretability matters for policy work. Decision-makers need to understand why a model flags something, not just that it does.</p>
         <p>The top predictor is <strong>airbag non-deployment</strong>, which likely serves as a proxy for crash force: airbags only deploy above a certain impact threshold, so their absence in serious crashes points to vehicle speed and size as underlying factors. <strong>Male drivers</strong> and <strong>seasonal conditions</strong> also rank consistently high.</p>
-        <p style="font-size:12px; color:var(--muted); margin-top:10px;">Feature importance scores reflect how much each variable reduces uncertainty in the model, not the direction or size of its effect.</p>
+        <p style="font-size:12px; color:var(--muted); margin-top:10px;">Values represent each feature's share of total impurity reduction across all splits in the tree and sum to 1 across all features used. A score of 0.063 means that feature drove about 6.3% of the model's decision-making.</p>
         <div class="tag-list">
           <span class="tag">Decision Tree</span>
           <span class="tag">Entropy / Info Gain</span>
